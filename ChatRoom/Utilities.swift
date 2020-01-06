@@ -24,4 +24,10 @@ struct Constants {
     static let changeCharacter = Notification.Name("changeCharacter")
     static let sendTapped = Notification.Name("sendTapped")
     static let clearTapped = Notification.Name("clearTapped")
+    static let chatSegue = Notification.Name("chatSegue")
+    static let msgSendTapped = Notification.Name("msgSendTapped")
+}
+
+struct GlobalVariables {
+    static var reversedColors: Bool = false
 }

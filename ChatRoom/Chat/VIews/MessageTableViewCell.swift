@@ -104,26 +104,36 @@ extension MessageTableViewCell {
     }
     
     func layoutForMyMessage() {
-        print("In ourself layout")
+       // print("In ourself layout")
         nameLabel.isHidden = true
         messageLabel.center = CGPoint(x: bounds.size.width - messageLabel.frame.width/2 - 16, y: bounds.size.height/2)
-        messageLabel.backgroundColor = Constants.messageRedColor
+         //messageLabel.backgroundColor = Constants.messageRedColor
+        if GlobalVariables.reversedColors {
+            messageLabel.backgroundColor = Constants.messageBlueColor
+        } else {
+            messageLabel.backgroundColor = Constants.messageRedColor
+        }
     }
     
     func layoutForSomebodyMessage() {
-        print("In somebody layout")
+        //print("In somebody layout")
         nameLabel.isHidden = false
         nameLabel.sizeToFit()
         nameLabel.center = CGPoint(x: nameLabel.bounds.size.width/2.0 + 16 + 4, y: nameLabel.bounds.size.height/2.0 + 4)
         messageLabel.center = CGPoint(x: messageLabel.frame.size.width/2 + 16, y: messageLabel.bounds.size.height/2.0 + nameLabel.bounds.size.height + 8)
-        messageLabel.backgroundColor = Constants.messageBlueColor
+         //messageLabel.backgroundColor = Constants.messageBlueColor
+        if GlobalVariables.reversedColors {
+            messageLabel.backgroundColor = Constants.messageRedColor
+        } else {
+            messageLabel.backgroundColor = Constants.messageBlueColor
+        }
         
     }
     
     // MARK: - Called through setNeedsLayout()
     override func layoutSubviews() {
         super.layoutSubviews()
-        print("In messageCell layout")
+        //print("In messageCell layout")
         //messageLabel.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
         if isJoinMessage {
             layoutForJoinMessage()

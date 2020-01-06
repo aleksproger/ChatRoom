@@ -8,12 +8,30 @@
 
 import UIKit
 
+protocol ChatServiceDelegate {
+    func receiveMessage(_ notification: Notification)
+}
+
 class ChatRoomViewController: UIViewController {
     private var keyboardIsShown: Bool = false
     private var lastContentOffset: CGFloat = 0
     var tableView = UITableView()
-    let messageInputBar = MessageInputView(.engToRus, type: .message)
-
+    var messageInputBar = MessageInputView(.engToRus, type: .message)
+    
+    init(_ inputBar: MessageInputView) {
+        self.messageInputBar = inputBar
+        if inputBar.translationType == .rusToEng {
+            GlobalVariables.reversedColors = true
+        } else {
+            GlobalVariables.reversedColors = false
+        }
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     var messages: [Message] = [
         Message(message: "Looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong message!", messageSender: .ourself, username: "Alex"),
         Message(message: "Tell me how to get to the library?", messageSender: .somebody, username: "Nick"),
@@ -58,6 +76,15 @@ extension ChatRoomViewController: UITableViewDelegate, UITableViewDataSource {
         return height
     }
     
+    func insertNewMessageCell(_ message: Message) {
+      messages.insert(message, at: 0)
+      let indexPath = IndexPath(row: 0, section: 0)
+      tableView.beginUpdates()
+      tableView.insertRows(at: [indexPath], with: .top)
+      tableView.endUpdates()
+      tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+    }
+    
     
     /*func scrollViewDidScroll(_ scrollView: UIScrollView) {
      var emptySpaceHeight: CGFloat = 0
@@ -98,16 +125,32 @@ extension ChatRoomViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_ :)), name: Constants.msgSendTapped, object: nil)
+        self.view.addGestureRecognizer(UISwipeGestureRecognizer(target: self, action: #selector(swipeBack(recognizer:))))
         loadViews()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+         tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
+    }
+    
+    @objc func swipeBack(recognizer: UISwipeGestureRecognizer) {
+        if recognizer.direction == .right {
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc func keyboardWillChange(notification: NSNotification) {
         keyboardIsShown.toggle()
+        print("now keyboard is", keyboardIsShown)
+        let safeArea = view.safeAreaLayoutGuide
         if let userInfo = notification.userInfo {
             let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)!.cgRectValue
-            print(endFrame.height, endFrame.origin.y, messageInputBar.center.y - messageInputBar.bounds.height)
-            if keyboardIsShown && (messageInputBar.center.y - messageInputBar.bounds.height) <= endFrame.origin.y {
+            print(endFrame.minY, safeArea.layoutFrame.maxY)
+            if keyboardIsShown &&  (safeArea.layoutFrame.maxY <= endFrame.minY) {
                 keyboardIsShown = false
+            } else if !keyboardIsShown && (safeArea.layoutFrame.maxY > endFrame.minY) {
+                keyboardIsShown = true
             }
             let messageBarHeight = self.messageInputBar.bounds.size.height
             var insets = view.safeAreaInsets
@@ -154,7 +197,7 @@ extension ChatRoomViewController {
         navigationController?.navigationBar.isHidden = true
         navigationItem.title = "Chat"
         navigationItem.backBarButtonItem?.title = "Run"
-        view.backgroundColor = .green
+        view.backgroundColor = .white
         //view.backgroundColor = UIColor(red: 24/255, green: 180/255, blue: 128/255, alpha: 1.0)
         
         tableView.dataSource = self
@@ -196,3 +239,14 @@ extension ChatRoomViewController {
     }
 }
 
+extension ChatRoomViewController: ChatServiceDelegate {
+    @objc func receiveMessage(_ notification: Notification) {
+        if let data = notification.userInfo as? [String : Any], let text = data["text"] as? String {
+            let message = Message(message: text, messageSender: .ourself, username: "Alex")
+            if message.message != "" {
+                self.insertNewMessageCell(message)
+            }
+        }
+    }
+    
+}

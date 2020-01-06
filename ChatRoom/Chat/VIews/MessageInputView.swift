@@ -20,6 +20,11 @@ import UIKit
     //func sendButtonTapped()
 }
 
+protocol InputView {
+    var viewModel: MessageInputDelegate? { get set }
+    var translationType: TranslationType { get }
+}
+
 enum TranslationType {
     case engToRus
     case rusToEng
@@ -30,11 +35,11 @@ enum InputType {
     case translation
 }
 
-class MessageInputView: UIView {
+class MessageInputView: UIView, InputView {
     var viewModel: MessageInputDelegate?
     var text: String = "Английский"
-    var shadows = UIView()
-    var shapes = UIView()
+    private var shadows = UIView()
+    private var shapes = UIView()
     
     private var rusImageView = UIImageView(image: UIImage(named: "rus"))
     private var engImageView = UIImageView(image: UIImage(named: "eng"))
@@ -220,5 +225,6 @@ class MessageInputView: UIView {
                 textField.text = "Русский"
         }
     }
+    
 }
 

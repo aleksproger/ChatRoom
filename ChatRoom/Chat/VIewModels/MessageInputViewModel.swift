@@ -14,6 +14,7 @@ class MessageInputViewModel: NSObject, MessageInputDelegate {
     private weak var view: MessageInputView?
     init(_ view: MessageInputView) {
         self.view = view
+        
     }
     @objc func microButtonTapped() {
         view?.clearButton.isHidden = true
@@ -36,7 +37,8 @@ class MessageInputViewModel: NSObject, MessageInputDelegate {
     }
     
     @objc func sendButtonTapped() {
-
+        NotificationCenter.default.post(name: Constants.msgSendTapped, object: nil, userInfo: ["text" : view?.textField.text])
+        setTypingMode()
     }
     
 }
@@ -56,6 +58,7 @@ extension MessageInputViewModel: UITextFieldDelegate {
         guard let view = view else {
             return
         }
+        view.textField.alpha = 0.8
         view.micButton.isHidden = false
         view.sendButton.isHidden = true
         view.clearButton.isHidden = true

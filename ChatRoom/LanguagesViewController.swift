@@ -14,6 +14,7 @@ class LanguagesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(swipeToChat(_ :)), name: Constants.chatSegue, object: nil)
         loadViews()
         // Do any additional setup after loading the view.
     }
@@ -22,6 +23,16 @@ class LanguagesViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         view.backgroundColor = .white
         view.addSubview(inputGroup0)
+    }
+    
+    @objc func swipeToChat(_ notification: Notification) {
+        print("In segue")
+        if let data = notification.userInfo as? [String : TranslationType], let id = data["id"] {
+            let vc = ChatRoomViewController(MessageInputView(id, type: .message))
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+
+        
     }
     
     override func viewDidLayoutSubviews() {

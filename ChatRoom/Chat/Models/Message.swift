@@ -31,5 +31,18 @@ extension String {
         return self.replacingOccurrences(of: "\n", with: "")
             .replacingOccurrences(of: "\r", with: "")
             .replacingOccurrences(of: "\0", with: "")
+            .replacingOccurrences(of: "\t", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+    }
+    
+    func isEmpty() -> Bool {
+        let range = NSRange(location: 0, length: self.utf16.count)
+        let regex = try! NSRegularExpression(pattern: "^(?!\\s*$).+")
+        if regex.firstMatch(in: self, options: [], range: range) != nil {
+            return false
+        } else {
+            return true
+        }
     }
 }

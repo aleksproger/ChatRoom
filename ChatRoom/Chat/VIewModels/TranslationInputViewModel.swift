@@ -68,6 +68,7 @@ extension TranslationInputViewModel: UITextFieldDelegate {
         guard let view = view else {
             return
         }
+        view.textField.alpha = 0.8
         view.micButton.isHidden = false
         view.sendButton.isHidden = true
         view.clearButton.isHidden = true
@@ -81,12 +82,12 @@ extension TranslationInputViewModel: UITextFieldDelegate {
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        NotificationCenter.default.post(name: Constants.didBeginEditing, object: self, userInfo: ["id" : view!.translationType])
+        //NotificationCenter.default.post(name: Constants.didBeginEditing, object: self, userInfo: ["id" : view!.translationType])
         setTypingMode()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        NotificationCenter.default.post(name: Constants.shouldReturn, object: self, userInfo: ["id" : view!.translationType])
+        //NotificationCenter.default.post(name: Constants.shouldReturn, object: self, userInfo: ["id" : view!.translationType])
         setDefaultMode()
         textField.resignFirstResponder()
         return true
@@ -99,7 +100,7 @@ extension TranslationInputViewModel: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         print("Post notification and text \(string)")
-        NotificationCenter.default.post(name: Constants.changeCharacter, object: self, userInfo: ["id" : view!.translationType, "char" : string])
+        //NotificationCenter.default.post(name: Constants.changeCharacter, object: self, userInfo: ["id" : view!.translationType, "char" : string])
         return true
     }
 }
