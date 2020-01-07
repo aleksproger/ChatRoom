@@ -16,6 +16,8 @@ class LanguagesViewController: UIViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(swipeToChat(_ :)), name: Constants.chatSegue, object: nil)
         loadViews()
+        let manager = APIManager()
+        manager.translate(.rusToEng, text: "Thing")
         // Do any additional setup after loading the view.
     }
     

@@ -26,6 +26,8 @@
 		FA8F951123C1F034005C0097 /* InputPairViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951023C1F034005C0097 /* InputPairViewModel.swift */; };
 		FA8F951323C22781005C0097 /* TranslationInputViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951223C22781005C0097 /* TranslationInputViewModel.swift */; };
 		FA8F951523C3CFF6005C0097 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951423C3CFF6005C0097 /* ChatService.swift */; };
+		FA8F951723C3D367005C0097 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951623C3D367005C0097 /* APIManager.swift */; };
+		FAE529D323C3D96500980197 /* TranslationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE529D223C3D96500980197 /* TranslationRequest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,8 @@
 		FA8F951023C1F034005C0097 /* InputPairViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPairViewModel.swift; sourceTree = "<group>"; };
 		FA8F951223C22781005C0097 /* TranslationInputViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationInputViewModel.swift; sourceTree = "<group>"; };
 		FA8F951423C3CFF6005C0097 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
+		FA8F951623C3D367005C0097 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
+		FAE529D223C3D96500980197 /* TranslationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				FA7E2C0B23BCDD6B00B6EC8F /* Message.swift */,
+				FAE529D223C3D96500980197 /* TranslationRequest.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -124,6 +129,7 @@
 				FA7E2C0A23BCDD5E00B6EC8F /* Models */,
 				FA7E2BF623BCDA4300B6EC8F /* ChatRoomViewController.swift */,
 				FA8F951423C3CFF6005C0097 /* ChatService.swift */,
+				FA8F951823C3D68C005C0097 /* API */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -136,6 +142,14 @@
 				FA8F951223C22781005C0097 /* TranslationInputViewModel.swift */,
 			);
 			path = VIewModels;
+			sourceTree = "<group>";
+		};
+		FA8F951823C3D68C005C0097 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				FA8F951623C3D367005C0097 /* APIManager.swift */,
+			);
+			path = API;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -210,6 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA8F951723C3D367005C0097 /* APIManager.swift in Sources */,
 				FA8F950C23C0CF50005C0097 /* InputViewPair.swift in Sources */,
 				FA7E2BF723BCDA4300B6EC8F /* ChatRoomViewController.swift in Sources */,
 				FA7E2BF323BCDA4300B6EC8F /* AppDelegate.swift in Sources */,
@@ -217,6 +232,7 @@
 				FA7E2C0C23BCDD6B00B6EC8F /* Message.swift in Sources */,
 				FA7E2BFD23BCDA4300B6EC8F /* ChatRoom.xcdatamodeld in Sources */,
 				FA7E2BF523BCDA4300B6EC8F /* SceneDelegate.swift in Sources */,
+				FAE529D323C3D96500980197 /* TranslationRequest.swift in Sources */,
 				FA8F950423BE44E0005C0097 /* Label.swift in Sources */,
 				FA8F951523C3CFF6005C0097 /* ChatService.swift in Sources */,
 				FA7E2C0E23BCDD9600B6EC8F /* MessageTableViewCell.swift in Sources */,

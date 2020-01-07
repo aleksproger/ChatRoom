@@ -12,6 +12,7 @@ struct Message {
     let message: String
     let senderUsername: String
     let messageSender: MessageSender
+    private var manager = APIManager()
     
     init(message: String, messageSender: MessageSender, username: String) {
         self.message = message.withoutWhitespace()
