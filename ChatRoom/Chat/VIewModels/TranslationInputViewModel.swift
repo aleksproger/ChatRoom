@@ -25,6 +25,7 @@ class TranslationInputViewModel: NSObject, MessageInputDelegate {
     init(_ view: MessageInputView) {
         self.view = view
     }
+    
     @objc func microButtonTapped() {
         view?.clearButton.isHidden = true
         view?.sendButton.isHidden = true
@@ -48,7 +49,9 @@ class TranslationInputViewModel: NSObject, MessageInputDelegate {
     }
     
     @objc func sendButtonTapped() {
-        NotificationCenter.default.post(name: Constants.sendTapped, object: self, userInfo: ["id" : view!.translationType])
+        if !view!.textField.text!.withoutWhitespace().isEmpty {
+            NotificationCenter.default.post(name: Constants.sendTapped, object: self, userInfo: ["id" : view!.translationType])
+        }
     }
     
 }
@@ -56,6 +59,7 @@ class TranslationInputViewModel: NSObject, MessageInputDelegate {
 extension TranslationInputViewModel: UITextFieldDelegate {
     
     func setTypingMode() {
+        view?.becomeFirstResponder()
         view?.textField.text = ""
         view?.textField.alpha = 1
         view?.micButton.isHidden = true
@@ -64,22 +68,6 @@ extension TranslationInputViewModel: UITextFieldDelegate {
         view?.recordButton.isHidden = true
     }
     
-    func setDefaultMode() {
-        guard let view = view else {
-            return
-        }
-        view.textField.alpha = 0.8
-        view.micButton.isHidden = false
-        view.sendButton.isHidden = true
-        view.clearButton.isHidden = true
-        view.recordButton.isHidden = true
-        switch view.translationType {
-        case .engToRus:
-            view.textField.text = "Английский"
-        case .rusToEng:
-            view.textField.text = "Русский"
-        }
-    }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         //NotificationCenter.default.post(name: Constants.didBeginEditing, object: self, userInfo: ["id" : view!.translationType])
@@ -88,19 +76,19 @@ extension TranslationInputViewModel: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         //NotificationCenter.default.post(name: Constants.shouldReturn, object: self, userInfo: ["id" : view!.translationType])
-        setDefaultMode()
+        view?.setDefaultMode()
         textField.resignFirstResponder()
         return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        setDefaultMode()
+        view?.setDefaultMode()
         textField.resignFirstResponder()
     }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        print("Post notification and text \(string)")
-        //NotificationCenter.default.post(name: Constants.changeCharacter, object: self, userInfo: ["id" : view!.translationType, "char" : string])
-        return true
-    }
+//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+//        print("Post notification and text \(string)")
+//        //NotificationCenter.default.post(name: Constants.changeCharacter, object: self, userInfo: ["id" : view!.translationType, "char" : string])
+//        return true
+//    }
 }

@@ -16,7 +16,7 @@ import UIKit
     func clearButtonTapped()
     func sendButtonTapped()
     func setTypingMode()
-    func setDefaultMode()
+    //func setDefaultMode()
     //func sendButtonTapped()
 }
 
@@ -25,7 +25,7 @@ protocol InputView {
     var translationType: TranslationType { get }
 }
 
-enum TranslationType {
+enum TranslationType: String, Codable {
     case engToRus
     case rusToEng
 }
@@ -225,6 +225,22 @@ class MessageInputView: UIView, InputView {
                 textField.text = "Русский"
         }
     }
+    
+    @objc func setDefaultMode() {
+        textField.resignFirstResponder()
+        textField.alpha = 0.8
+        micButton.isHidden = false
+        sendButton.isHidden = true
+        clearButton.isHidden = true
+        recordButton.isHidden = true
+        switch translationType {
+        case .engToRus:
+            textField.text = "Английский"
+        case .rusToEng:
+            textField.text = "Русский"
+        }
+    }
+    
     
 }
 

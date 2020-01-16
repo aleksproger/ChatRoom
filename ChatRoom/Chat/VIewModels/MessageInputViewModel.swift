@@ -9,22 +9,37 @@
 import Foundation
 import UIKit
 import Combine
+import Speech
+
 
 class MessageInputViewModel: NSObject, MessageInputDelegate {
+    
     private weak var view: MessageInputView?
+    let speechRecognition = SpeechRecognition()
+    
     init(_ view: MessageInputView) {
         self.view = view
-        
     }
+
+    
     @objc func microButtonTapped() {
-        view?.clearButton.isHidden = true
-        view?.sendButton.isHidden = true
-        view?.micButton.isHidden = true
-        view?.recordButton.isHidden = false
-        view?.textField.text = "Говорите..."
+        speechRecognition.startRecording() { isAuthorized in
+            if isAuthorized {
+                DispatchQueue.main.async {
+                    print("Authorized")
+                    self.view?.clearButton.isHidden = true
+                    self.view?.sendButton.isHidden = true
+                    self.view?.micButton.isHidden = true
+                    self.view?.recordButton.isHidden = false
+                    self.view?.textField.text = "Говорите..."
+                }
+            }
+        }
+
     }
     
     @objc func recordButtonTapped() {
+        speechRecognition.stopRecording()
         view?.clearButton.isHidden = true
         view?.sendButton.isHidden = true
         view?.micButton.isHidden = false
@@ -37,7 +52,8 @@ class MessageInputViewModel: NSObject, MessageInputDelegate {
     }
     
     @objc func sendButtonTapped() {
-        NotificationCenter.default.post(name: Constants.msgSendTapped, object: nil, userInfo: ["text" : view?.textField.text])
+        NotificationCenter.default.post(name: Constants.msgSendTapped, object: nil, userInfo: ["text" : view!.textField.text!])
+        print("Pos notification about send")
         setTypingMode()
     }
     
@@ -54,34 +70,34 @@ extension MessageInputViewModel: UITextFieldDelegate {
         view?.recordButton.isHidden = true
     }
     
-    func setDefaultMode() {
-        guard let view = view else {
-            return
-        }
-        view.textField.alpha = 0.8
-        view.micButton.isHidden = false
-        view.sendButton.isHidden = true
-        view.clearButton.isHidden = true
-        view.recordButton.isHidden = true
-        switch view.translationType {
-        case .engToRus:
-            view.textField.text = "Английский"
-        case .rusToEng:
-            view.textField.text = "Русский"
-        }
-    }
+//    func setDefaultMode() {
+//        guard let view = view else {
+//            return
+//        }
+//        view.textField.alpha = 0.8
+//        view.micButton.isHidden = false
+//        view.sendButton.isHidden = true
+//        view.clearButton.isHidden = true
+//        view.recordButton.isHidden = true
+//        switch view.translationType {
+//        case .engToRus:
+//            view.textField.text = "Английский"
+//        case .rusToEng:
+//            view.textField.text = "Русский"
+//        }
+//    }
     func textFieldDidBeginEditing(_ textField: UITextField) {
         setTypingMode()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        setDefaultMode()
+        view?.setDefaultMode()
         textField.resignFirstResponder()
         return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        setDefaultMode()
+        view?.setDefaultMode()
         textField.resignFirstResponder()
     }
     

@@ -8,6 +8,12 @@
 
 import UIKit
 
+struct OutputMessage: Codable {
+    var text: String
+    var type: TranslationType
+    var username: String
+}
+
 protocol ChatServiceDelegate {
     func receiveMessage(_ notification: Notification)
 }
@@ -15,6 +21,8 @@ protocol ChatServiceDelegate {
 class ChatRoomViewController: UIViewController {
     private var keyboardIsShown: Bool = false
     private var lastContentOffset: CGFloat = 0
+    private var currentContentInset: UIEdgeInsets = .zero
+    //private let chatService = ChatService()
     var tableView = UITableView()
     var messageInputBar = MessageInputView(.engToRus, type: .message)
     
@@ -76,13 +84,17 @@ extension ChatRoomViewController: UITableViewDelegate, UITableViewDataSource {
         return height
     }
     
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
+    }
+    
     func insertNewMessageCell(_ message: Message) {
-      messages.insert(message, at: 0)
-      let indexPath = IndexPath(row: 0, section: 0)
-      tableView.beginUpdates()
-      tableView.insertRows(at: [indexPath], with: .top)
-      tableView.endUpdates()
-      tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+        messages.insert(message, at: 0)
+        let indexPath = IndexPath(row: 0, section: 0)
+        tableView.beginUpdates()
+        tableView.insertRows(at: [indexPath], with: .top)
+        tableView.endUpdates()
+        tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
     
     
@@ -115,8 +127,7 @@ extension ChatRoomViewController: UITableViewDelegate, UITableViewDataSource {
      let height: CGFloat = 52.0
      tableView.tableFooterView?.frame = CGRect(x: 0, y: y
      , width: UIScreen.main.bounds.size.width, height: height)
-     }
-     */
+     }*/
     
     
 }
@@ -125,13 +136,19 @@ extension ChatRoomViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_ :)), name: Constants.msgSendTapped, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(sendMessage(_ :)), name: Constants.msgSendTapped, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_:)), name: Constants.msgReceived, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(receiveJoinMessage(_:)), name: Constants.joinMsgReceived, object: nil)
         self.view.addGestureRecognizer(UISwipeGestureRecognizer(target: self, action: #selector(swipeBack(recognizer:))))
+        //ChatService.shared.writeMessage("Zdarova")
+        ChatService.shared.joinChat(username: "Alex")
         loadViews()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-         tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
+        if self.tableView.numberOfSections != 0 && self.tableView.numberOfRows(inSection: 0) != 0 {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
+        }
     }
     
     @objc func swipeBack(recognizer: UISwipeGestureRecognizer) {
@@ -165,32 +182,34 @@ extension ChatRoomViewController {
             UIView.animate(withDuration: 0.25) {
                 self.messageInputBar.center = point
                 self.tableView.contentInset = inset
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
+                if self.tableView.numberOfSections != 0 && self.tableView.numberOfRows(inSection: 0) != 0  && self.tableView.contentInset.top != 0{
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
+                }
             }
-
+            
         }
     }
     
-   /* @objc func microButtonTapped() {
-        /*messageInputBar.clearButton.isHidden = true
-        messageInputBar.sendButton.isHidden = true
-        messageInputBar.micButton.isHidden = true
-        messageInputBar.recordButton.isHidden = false
-        messageInputBar.textField.text = "Говорите..."*/
-        messageInputBar.viewModel?.microButtonTapped()
-    }
-    
-    @objc func recordButtonTapped() {
-        messageInputBar.clearButton.isHidden = true
-        messageInputBar.sendButton.isHidden = true
-        messageInputBar.micButton.isHidden = false
-        messageInputBar.recordButton.isHidden = true
-        messageInputBar.textField.text = "Английский"
-    }
-    
-    @objc func clearButtonTapped() {
-        messageInputBar.textField.text = ""
-    }*/
+    /* @objc func microButtonTapped() {
+     /*messageInputBar.clearButton.isHidden = true
+     messageInputBar.sendButton.isHidden = true
+     messageInputBar.micButton.isHidden = true
+     messageInputBar.recordButton.isHidden = false
+     messageInputBar.textField.text = "Говорите..."*/
+     messageInputBar.viewModel?.microButtonTapped()
+     }
+     
+     @objc func recordButtonTapped() {
+     messageInputBar.clearButton.isHidden = true
+     messageInputBar.sendButton.isHidden = true
+     messageInputBar.micButton.isHidden = false
+     messageInputBar.recordButton.isHidden = true
+     messageInputBar.textField.text = "Английский"
+     }
+     
+     @objc func clearButtonTapped() {
+     messageInputBar.textField.text = ""
+     }*/
     
     // Adding new views to ierarchy and give content to existing
     func loadViews() {
@@ -215,6 +234,7 @@ extension ChatRoomViewController {
          tableView.tableFooterView = footer*/
         tableView.showsVerticalScrollIndicator = false
         tableView.transform = CGAffineTransform(scaleX: 1,y: -1)
+        tableView.keyboardDismissMode = .onDrag
         view.addSubview(tableView)
         view.addSubview(messageInputBar)
         
@@ -241,10 +261,34 @@ extension ChatRoomViewController {
 
 extension ChatRoomViewController: ChatServiceDelegate {
     @objc func receiveMessage(_ notification: Notification) {
-        if let data = notification.userInfo as? [String : Any], let text = data["text"] as? String {
-            let message = Message(message: text, messageSender: .ourself, username: "Alex")
+        if let data = notification.userInfo as? [String : Message], let message = data["message"] {
+            //let message = Message(message: text, messageSender: .ourself, username: "Alex")
             if message.message != "" {
                 self.insertNewMessageCell(message)
+            }
+        }
+    }
+    
+    @objc func receiveJoinMessage(_ notification: Notification) {
+        if let data = notification.userInfo as? [String : String], let msg = data["text"] {
+            //let message = Message(message: text, messageSender: .ourself, username: "Alex")
+            if msg.withoutWhitespace() != "" {
+                let message = Message(message: msg, messageSender: .somebody, username: "System")
+                DispatchQueue.main.async {
+                    self.insertNewMessageCell(message)
+                }
+            }
+        }
+    }
+    
+    @objc func sendMessage(_ notification: Notification) {
+        if let data = notification.userInfo as? [String : Any], let text = data["text"] as? String {
+            //let message = Message(message: text, messageSender: .ourself, username: "Alex")
+            if text.withoutWhitespace() != "" {
+                //self.insertNewMessageCell(message)
+                
+                //ChatService.shared.writeMessage(message.message)
+                ChatService.shared.sendMessaage(OutputMessage(text: text, type: messageInputBar.translationType, username: "Alex"))
             }
         }
     }

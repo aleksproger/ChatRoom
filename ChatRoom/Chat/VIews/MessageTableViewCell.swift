@@ -7,9 +7,10 @@
 //
 
 import UIKit
-enum MessageSender {
+enum MessageSender: String, Codable {
     case ourself
     case somebody
+    case server
 }
 
 
@@ -77,6 +78,8 @@ extension MessageTableViewCell {
         case .somebody:
             messageLabel.layer.cornerRadius = min(messageLabel.bounds.size.height/3.0, 20)
             messageLabel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        default:
+            break
         }
     }
     // MARK: - If the string has whitespaces and has joined in the and then join message (meesage string contains no whitespaces)

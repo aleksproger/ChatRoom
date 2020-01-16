@@ -16,8 +16,7 @@ class LanguagesViewController: UIViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(swipeToChat(_ :)), name: Constants.chatSegue, object: nil)
         loadViews()
-        let manager = APIManager()
-        manager.translate(.rusToEng, text: "Thing")
+        //manager.translate(.rusToEng, text: "Thing")
         // Do any additional setup after loading the view.
     }
     
@@ -49,13 +48,22 @@ class LanguagesViewController: UIViewController {
         inputGroup0.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: 2 * 44 + 40)
         inputGroup0.center = CGPoint(x: inputGroup0.bounds.size.width/2.0, y: inputGroup0.bounds.height/2.0 + insets.top + 15)
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("Touch registered")
+        UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
     }
-    */
+    
+     
 }
+
+extension UIResponder {
+    func responderChain() -> String {
+        guard let next = next else {
+            return String(describing: self) + "NO"
+        }
+        return String(describing: self) + " -> " + next.responderChain()
+    }
+}
+
+

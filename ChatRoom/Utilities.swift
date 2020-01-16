@@ -26,6 +26,8 @@ struct Constants {
     static let clearTapped = Notification.Name("clearTapped")
     static let chatSegue = Notification.Name("chatSegue")
     static let msgSendTapped = Notification.Name("msgSendTapped")
+    static let msgReceived = Notification.Name("msgReceived")
+    static let joinMsgReceived = Notification.Name("joinMsgReceived")
 }
 
 struct GlobalVariables {

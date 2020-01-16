@@ -9,15 +9,16 @@
 import Foundation
 
 final class APIManager {
-    func translate(_ translationType: TranslationType, text: String)  {
+    func translate(_ translationType: TranslationType, text: String, completion: @escaping  (String) -> Void)  {
         switch translationType {
         case .engToRus:
             makeEngToRusRequest(text: text) { translation in
-                print(translation)
+                print("Translation - \(translation)")
+                completion(translation)
             }
         case .rusToEng:
             makeRusToEngRequest(text: text) { translation in
-                print(translation)
+                completion(translation)
             }
         }
     }
@@ -34,9 +35,11 @@ private extension APIManager {
     func makeEngToRusRequest(text: String, completion: @escaping (String) -> Void) {
         let request = makeRequest(translation: "en-ru", text: text)
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            print(data)
+            //print(data)
             if let data = data, let request = try? JSONDecoder.init().decode(TranslationRequest.self, from: data) {
-                print(request.text)
+                print(request.text[0])
+                let translation = request.text[0]
+                completion(translation)
             }
         }
         task.resume()
@@ -46,9 +49,11 @@ private extension APIManager {
         let request = makeRequest(translation: "ru-en", text: text)
 
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            print(data)
+            //print(data)
             if let data = data, let request = try? JSONDecoder.init().decode(TranslationRequest.self, from: data) {
-                print(request.text)
+                print(request.text[0])
+                let translation = request.text[0]
+                completion(translation)
             }
         }
         task.resume()

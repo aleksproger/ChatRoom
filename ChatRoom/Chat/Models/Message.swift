@@ -8,23 +8,21 @@
 
 import Foundation
 
-struct Message {
+struct Message: Codable {
     let message: String
     let senderUsername: String
-    let messageSender: MessageSender
-    private var manager = APIManager()
+    var messageSender: MessageSender
+    var translatedMessage: String
+    //private var manager = APIManager()
     
-    init(message: String, messageSender: MessageSender, username: String) {
+    init(message: String, translatedMessage: String = "", messageSender: MessageSender, username: String) {
         self.message = message.withoutWhitespace()
         self.messageSender = messageSender
         self.senderUsername = username
+        self.translatedMessage = translatedMessage
     }
     
-    var translatedMessage: String {
-        get {
-            return "Перевод"
-        }
-    }
+
 }
 
 extension String {

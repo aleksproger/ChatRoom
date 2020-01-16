@@ -60,5 +60,9 @@
 	<array>
 		<string>YandexSansText-Medium.ttf</string>
 	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>To dictate messages you need to grant an access to microphone</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need to recore your voice</string>
 </dict>
 </plist>
