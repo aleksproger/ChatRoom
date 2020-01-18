@@ -9,8 +9,12 @@
 import Foundation
 import Speech
 
+protocol Recognition {
+    func startRecording(callback: @escaping(Bool) -> Void)
+    func stopRecording()
+}
 
-class SpeechRecognition {
+class SpeechRecognition: Recognition {
     let engine = AVAudioEngine()
     let req = SFSpeechAudioBufferRecognitionRequest()
     

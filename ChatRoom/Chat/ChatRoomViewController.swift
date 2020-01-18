@@ -22,11 +22,12 @@ class ChatRoomViewController: UIViewController {
     private var keyboardIsShown: Bool = false
     private var lastContentOffset: CGFloat = 0
     private var currentContentInset: UIEdgeInsets = .zero
+    private var viewModel = ChatRoomViewModel()
     //private let chatService = ChatService()
     var tableView = UITableView()
     var messageInputBar = MessageInputView(.engToRus, type: .message)
     
-    init(_ inputBar: MessageInputView) {
+    init(_ inputBar: MessageInputView, chatService: ChatService = ChatService.shared) {
         self.messageInputBar = inputBar
         if inputBar.translationType == .rusToEng {
             GlobalVariables.reversedColors = true
@@ -65,39 +66,46 @@ class ChatRoomViewController: UIViewController {
     
 }
 
-extension ChatRoomViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = MessageTableViewCell(style: .default, reuseIdentifier: "MessageCell")
-        cell.transform = CGAffineTransform(scaleX: 1, y: -1)
-        cell.selectionStyle = .none
-        let message = messages[indexPath.row]
-        cell.apply(message: message)
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let height = MessageTableViewCell.height(for: messages[indexPath.row])
-        return height
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
-    }
+extension ChatRoomViewController /*UITableViewDelegate, UITableViewDataSource*/ {
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        return messages.count
+//    }
+//
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = MessageTableViewCell(style: .default, reuseIdentifier: "MessageCell")
+//        cell.transform = CGAffineTransform(scaleX: 1, y: -1)
+//        cell.selectionStyle = .none
+//        let message = messages[indexPath.row]
+//        cell.apply(message: message)
+//        return cell
+//    }
+//
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        let height = MessageTableViewCell.height(for: messages[indexPath.row])
+//        return height
+//    }
+//
+//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
+//    }
+//
+//    func insertNewMessageCell(_ message: Message) {
+//        messages.insert(message, at: 0)
+//        let indexPath = IndexPath(row: 0, section: 0)
+//        tableView.beginUpdates()
+//        tableView.insertRows(at: [indexPath], with: .top)
+//        tableView.endUpdates()
+//        tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+//    }
     
     func insertNewMessageCell(_ message: Message) {
-        messages.insert(message, at: 0)
-        let indexPath = IndexPath(row: 0, section: 0)
+        viewModel.insertMessage(message)
         tableView.beginUpdates()
+        let indexPath = IndexPath(row: 0, section: 0)
         tableView.insertRows(at: [indexPath], with: .top)
         tableView.endUpdates()
         tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
-    
-    
     /*func scrollViewDidScroll(_ scrollView: UIScrollView) {
      var emptySpaceHeight: CGFloat = 0
      var y: CGFloat = scrollView.contentSize.height - Constants.footerHeight
@@ -219,8 +227,8 @@ extension ChatRoomViewController {
         view.backgroundColor = .white
         //view.backgroundColor = UIColor(red: 24/255, green: 180/255, blue: 128/255, alpha: 1.0)
         
-        tableView.dataSource = self
-        tableView.delegate = self
+        tableView.dataSource = viewModel
+        tableView.delegate = viewModel
         tableView.separatorStyle = .none
         /* let footer = UITableViewHeaderFooterView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: Constants.footerHeight))
          print(footer.frame.size)

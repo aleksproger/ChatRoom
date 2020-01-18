@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		516B2BAAA9B402A2F33650B5 /* Pods_ChatRoom.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E2353A5A188090E98C31618 /* Pods_ChatRoom.framework */; };
+		FA098AA123D1FE6100AB8AE9 /* TranslationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA098AA023D1FE6100AB8AE9 /* TranslationType.swift */; };
+		FA098AA323D31EA100AB8AE9 /* InputViewElementsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */; };
+		FA098AA523D3232E00AB8AE9 /* ChatRoomViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA098AA423D3232E00AB8AE9 /* ChatRoomViewModel.swift */; };
 		FA3900BE23CDFBB700CB9B20 /* SpeechRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3900BD23CDFBB700CB9B20 /* SpeechRecognition.swift */; };
 		FA7E2BF323BCDA4300B6EC8F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7E2BF223BCDA4300B6EC8F /* AppDelegate.swift */; };
 		FA7E2BF523BCDA4300B6EC8F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7E2BF423BCDA4300B6EC8F /* SceneDelegate.swift */; };
@@ -36,6 +39,9 @@
 		8810EDF0386225D3C654B35B /* Pods-ChatRoom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatRoom.debug.xcconfig"; path = "Target Support Files/Pods-ChatRoom/Pods-ChatRoom.debug.xcconfig"; sourceTree = "<group>"; };
 		8E2353A5A188090E98C31618 /* Pods_ChatRoom.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ChatRoom.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D357B6011848AFF7CA1DE4D /* Pods-ChatRoom.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatRoom.release.xcconfig"; path = "Target Support Files/Pods-ChatRoom/Pods-ChatRoom.release.xcconfig"; sourceTree = "<group>"; };
+		FA098AA023D1FE6100AB8AE9 /* TranslationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationType.swift; sourceTree = "<group>"; };
+		FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewElementsFactory.swift; sourceTree = "<group>"; };
+		FA098AA423D3232E00AB8AE9 /* ChatRoomViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomViewModel.swift; sourceTree = "<group>"; };
 		FA3900BD23CDFBB700CB9B20 /* SpeechRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognition.swift; sourceTree = "<group>"; };
 		FA7E2BEF23BCDA4300B6EC8F /* ChatRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA7E2BF223BCDA4300B6EC8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -140,6 +146,7 @@
 			children = (
 				FA7E2C0B23BCDD6B00B6EC8F /* Message.swift */,
 				FAE529D223C3D96500980197 /* TranslationRequest.swift */,
+				FA098AA023D1FE6100AB8AE9 /* TranslationType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -151,6 +158,7 @@
 				FA7E2C0D23BCDD9600B6EC8F /* MessageTableViewCell.swift */,
 				FA8F950523BF4358005C0097 /* MessageInputView.swift */,
 				FA8F950323BE44E0005C0097 /* Label.swift */,
+				FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */,
 			);
 			path = VIews;
 			sourceTree = "<group>";
@@ -162,6 +170,7 @@
 				FA7E2C0F23BCDFDC00B6EC8F /* VIews */,
 				FA7E2C0A23BCDD5E00B6EC8F /* Models */,
 				FA7E2BF623BCDA4300B6EC8F /* ChatRoomViewController.swift */,
+				FA098AA423D3232E00AB8AE9 /* ChatRoomViewModel.swift */,
 				FA8F951423C3CFF6005C0097 /* ChatService.swift */,
 				FA8F951823C3D68C005C0097 /* API */,
 			);
@@ -307,14 +316,17 @@
 				FA8F950C23C0CF50005C0097 /* InputViewPair.swift in Sources */,
 				FA7E2BF723BCDA4300B6EC8F /* ChatRoomViewController.swift in Sources */,
 				FA7E2BF323BCDA4300B6EC8F /* AppDelegate.swift in Sources */,
+				FA098AA123D1FE6100AB8AE9 /* TranslationType.swift in Sources */,
 				FA7E2C1123BD07D900B6EC8F /* Utilities.swift in Sources */,
 				FA7E2C0C23BCDD6B00B6EC8F /* Message.swift in Sources */,
 				FA7E2BFD23BCDA4300B6EC8F /* ChatRoom.xcdatamodeld in Sources */,
 				FA7E2BF523BCDA4300B6EC8F /* SceneDelegate.swift in Sources */,
 				FAE529D323C3D96500980197 /* TranslationRequest.swift in Sources */,
+				FA098AA523D3232E00AB8AE9 /* ChatRoomViewModel.swift in Sources */,
 				FA8F950423BE44E0005C0097 /* Label.swift in Sources */,
 				FA8F951523C3CFF6005C0097 /* ChatService.swift in Sources */,
 				FA7E2C0E23BCDD9600B6EC8F /* MessageTableViewCell.swift in Sources */,
+				FA098AA323D31EA100AB8AE9 /* InputViewElementsFactory.swift in Sources */,
 				FA8F950A23C0BD27005C0097 /* LanguagesViewController.swift in Sources */,
 				FA3900BE23CDFBB700CB9B20 /* SpeechRecognition.swift in Sources */,
 				FA8F950623BF4358005C0097 /* MessageInputView.swift in Sources */,

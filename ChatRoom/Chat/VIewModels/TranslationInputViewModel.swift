@@ -71,7 +71,8 @@ extension TranslationInputViewModel: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         //NotificationCenter.default.post(name: Constants.didBeginEditing, object: self, userInfo: ["id" : view!.translationType])
-        setTypingMode()
+        //view?.becomeFirstResponder()
+        view?.setTypingMode()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -85,10 +86,4 @@ extension TranslationInputViewModel: UITextFieldDelegate {
         view?.setDefaultMode()
         textField.resignFirstResponder()
     }
-    
-//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-//        print("Post notification and text \(string)")
-//        //NotificationCenter.default.post(name: Constants.changeCharacter, object: self, userInfo: ["id" : view!.translationType, "char" : string])
-//        return true
-//    }
 }

@@ -20,30 +20,22 @@ import UIKit
     //func sendButtonTapped()
 }
 
-protocol InputView {
+protocol InputView: UIView {
     var viewModel: MessageInputDelegate? { get set }
     var translationType: TranslationType { get }
 }
 
-enum TranslationType: String, Codable {
-    case engToRus
-    case rusToEng
-}
-
-enum InputType {
-    case message
-    case translation
-}
 
 class MessageInputView: UIView, InputView {
     var viewModel: MessageInputDelegate?
     var text: String = "Английский"
+    
+    private let factory = Factory()
+    
     private var shadows = UIView()
     private var shapes = UIView()
     
-    private var rusImageView = UIImageView(image: UIImage(named: "rus"))
-    private var engImageView = UIImageView(image: UIImage(named: "eng"))
-    private var imagesContainerView = UIView()
+    var flagsView: UIView!
     
     var textField = UITextField()
     
@@ -60,46 +52,31 @@ class MessageInputView: UIView, InputView {
         self.translationType = translationType
         switch type {
         case .message:
-            self.viewModel = MessageInputViewModel(self)
+            self.viewModel = MessageInputViewModel(self, recognizer: SpeechRecognition())
         case .translation:
             self.viewModel = TranslationInputViewModel(self)
         }
         
-        micButton.addTarget(viewModel, action: #selector(viewModel?.microButtonTapped), for: .touchUpInside)
-        recordButton.addTarget(viewModel, action: #selector(viewModel?.recordButtonTapped), for: .touchUpInside)
-        clearButton.addTarget(viewModel, action: #selector(viewModel?.clearButtonTapped), for: .touchUpInside)
-        sendButton.addTarget(viewModel, action: #selector(viewModel?.sendButtonTapped), for: .touchUpInside)
         self.textField.delegate = viewModel as? UITextFieldDelegate
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        //shadows = factory.makeShadowView(forView: self)
         translatesAutoresizingMaskIntoConstraints = false
         shadows.translatesAutoresizingMaskIntoConstraints = false
         shapes.translatesAutoresizingMaskIntoConstraints = false
         shapes.clipsToBounds = true
         shadows.clipsToBounds = false
-        
+
         addSubview(shadows)
         addSubview(shapes)
-        
+        //textField = factory.makeTextField(forView: self)
+        //textField.delegate = viewModel as? UITextFieldDelegate
         addSubview(textField)
         
         micButton.setImage(UIImage(named: "micro")!, for: .normal)
         addSubview(micButton)
-        
-        
-        sendButton.setImage(UIImage(named: "send"), for: .normal)
-        sendButton.isHidden = true
-        addSubview(sendButton)
-        
-        clearButton.setImage(UIImage(named: "clear"), for: .normal)
-        clearButton.isHidden = true
-        addSubview(clearButton)
-        
-        recordButton.setImage(UIImage(named: "record"), for: .normal)
-        recordButton.isHidden = true
-        addSubview(recordButton)
         
         
     }
@@ -110,28 +87,41 @@ class MessageInputView: UIView, InputView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        addFlagsView()
         
+        flagsView = factory.makeFlagsView(translationType, forView: self)
+        addSubview(flagsView)
+
         setShadows()
         setShape()
         
-        makeFlagsView()
         makeTextFieldView()
 
         
         micButton.frame = CGRect(x: 0, y: 0, width: 12, height: 16)
         micButton.center = CGPoint(x: bounds.maxX - 16 - micButton.bounds.width/2.0, y: bounds.height/2.0)
         
-        sendButton.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
-        sendButton.center = CGPoint(x: bounds.maxX - 14 - sendButton.bounds.width/2.0, y: bounds.height/2.0)
+        sendButton = factory.makeSendButton(forView: self)
+        addSubview(sendButton)
         
-        clearButton.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
-        clearButton.center = CGPoint(x: bounds.maxX - 46 - clearButton.bounds.width/2.0, y: bounds.height/2.0)
+        clearButton = factory.makeClearButton(forView: self)
+        addSubview(clearButton)
         
-        recordButton.frame = CGRect(x: 0, y: 0, width: 18, height: 16)
-        recordButton.center = CGPoint(x: bounds.maxX - 16 - recordButton.bounds.width/2.0, y: bounds.height/2.0)
+        recordButton = factory.makeRecordButton(forView: self)
+        addSubview(recordButton)
+        
+//        micButton = factory.makeMicButton(forView: self)
+//        addSubview(micButton)
+        
+        registerButtons()
         
     }
+    func registerButtons() {
+        micButton.addTarget(viewModel, action: #selector(viewModel?.microButtonTapped), for: .touchUpInside)
+        clearButton.addTarget(viewModel, action: #selector(viewModel?.clearButtonTapped), for: .touchUpInside)
+        sendButton.addTarget(viewModel, action: #selector(viewModel?.sendButtonTapped), for: .touchUpInside)
+        recordButton.addTarget(viewModel, action: #selector(viewModel?.recordButtonTapped), for: .touchUpInside)
+    }
+    
     func setShape() {
         shapes.frame = bounds
         shapes.center = CGPoint(x: frame.size.width/2.0 , y: shapes.bounds.size.height/2.0)
@@ -162,49 +152,6 @@ class MessageInputView: UIView, InputView {
         case .rusToEng:
             shadows.layer.shadowColor = Constants.redShadowColor
         }
-        
-    }
-    
-    func makeFlagsView() {
-        imagesContainerView.layer.cornerRadius = 18
-        imagesContainerView.frame = CGRect(x: 0, y: 0, width: 46, height: 36)
-        imagesContainerView.center = CGPoint(x: bounds.minX + 4 + 23, y: bounds.size.height/2.0)
-        
-        rusImageView.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
-        rusImageView.layer.borderWidth = 1.0
-        rusImageView.layer.cornerRadius = 16
-        rusImageView.layer.borderColor = UIColor.white.cgColor
-
-        engImageView.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
-        engImageView.layer.borderWidth = 1.0
-        engImageView.layer.cornerRadius = 16
-        engImageView.layer.borderColor = UIColor.white.cgColor
-
-        switch translationType {
-            case .engToRus:
-                rusImageView.center = CGPoint(x: bounds.minX + 2 + 16 + 10, y: imagesContainerView.bounds.size.height/2.0)
-                engImageView.center = CGPoint(x: bounds.minX + 2 + 16 , y: imagesContainerView.bounds.size.height/2.0)
-            case .rusToEng:
-                rusImageView.center = CGPoint(x: bounds.minX + 2 + 16 + 10, y: imagesContainerView.bounds.size.height/2.0)
-                engImageView.center = CGPoint(x: bounds.minX + 2 + 16, y: imagesContainerView.bounds.size.height/2.0)
-        }
-    }
-    
-    func addFlagsView() {
-        switch translationType {
-            case .engToRus:
-                print("in engtorus")
-                imagesContainerView.backgroundColor = .white
-                imagesContainerView.addSubview(rusImageView)
-                imagesContainerView.addSubview(engImageView)
-                addSubview(imagesContainerView)
-            case .rusToEng:
-                print("in rus to eng")
-                imagesContainerView.backgroundColor = .white
-                imagesContainerView.addSubview(engImageView)
-                imagesContainerView.addSubview(rusImageView)
-                addSubview(imagesContainerView)
-        }
 
     }
     
@@ -219,10 +166,10 @@ class MessageInputView: UIView, InputView {
         textField.clearsOnInsertion = true
         textField.tintColor = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
         switch translationType {
-            case .engToRus:
-                textField.text = "Английский"
-            case .rusToEng:
-                textField.text = "Русский"
+        case .engToRus:
+            textField.text = "Английский"
+        case .rusToEng:
+            textField.text = "Русский"
         }
     }
     
@@ -241,6 +188,17 @@ class MessageInputView: UIView, InputView {
         }
     }
     
+    @objc func setTypingMode() {
+            textField.becomeFirstResponder()
+            textField.text = ""
+            textField.alpha = 1
+            micButton.isHidden = true
+            sendButton.isHidden = false
+            clearButton.isHidden = false
+            recordButton.isHidden = true
+    }
+    
     
 }
+
 

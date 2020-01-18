@@ -15,10 +15,11 @@ import Speech
 class MessageInputViewModel: NSObject, MessageInputDelegate {
     
     private weak var view: MessageInputView?
-    let speechRecognition = SpeechRecognition()
+    private var speechRecognition: Recognition!
     
-    init(_ view: MessageInputView) {
+    init(_ view: MessageInputView, recognizer: Recognition) {
         self.view = view
+        self.speechRecognition = recognizer
     }
 
     
