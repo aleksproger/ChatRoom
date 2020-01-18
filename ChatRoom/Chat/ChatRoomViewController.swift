@@ -7,8 +7,7 @@
 //
 
 import UIKit
-
-
+import Combine
 
 protocol ChatServiceDelegate {
     func receiveMessage(_ notification: Notification)
@@ -19,6 +18,7 @@ class ChatRoomViewController: UIViewController {
     private var lastContentOffset: CGFloat = 0
     private var currentContentInset: UIEdgeInsets = .zero
     private var viewModel = ChatRoomViewModel()
+    private var subscriptions = Set<AnyCancellable>()
     var tableView = UITableView()
     var messageInputBar = MessageInputView(.engToRus, type: .message)
     
@@ -45,6 +45,15 @@ class ChatRoomViewController: UIViewController {
         tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
     
+    func updateTableView() {
+        tableView.beginUpdates()
+        let indexPath = IndexPath(row: 0, section: 0)
+        tableView.insertRows(at: [indexPath], with: .top)
+        tableView.endUpdates()
+        if tableView.numberOfRows(inSection: 0) > 0 {
+            tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+        }
+    }
     
 }
 
@@ -52,6 +61,14 @@ class ChatRoomViewController: UIViewController {
 extension ChatRoomViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        viewModel.messages
+            .handleEvents { messages in
+                self.updateTableView()
+        }
+        .ignoreOutput()
+        .sink { (_) in}
+        .store(in: &subscriptions)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(sendMessage(_ :)), name: Constants.msgSendTapped, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_:)), name: Constants.msgReceived, object: nil)

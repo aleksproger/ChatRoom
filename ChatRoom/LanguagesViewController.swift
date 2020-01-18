@@ -23,7 +23,6 @@ class LanguagesViewController: UIViewController {
     func loadViews() {
         navigationController?.navigationBar.isHidden = true
         view.backgroundColor = .white
-
     }
     
     @objc func swipeToChat(_ notification: Notification) {
@@ -35,13 +34,18 @@ class LanguagesViewController: UIViewController {
         
     }
     
-//    @objc func swipeToChat(_ translationType: TranslationType) {
-//        print("In segue")
-//            let vc = ChatRoomViewController(MessageInputView(translationType, type: .message))
-//            self.navigationController?.pushViewController(vc, animated: true)
-//
-//
-//    }
+    @objc func swipeToEngRusChat() {
+        print("in swipe")
+        let vc = ChatRoomViewController(MessageInputView(.engToRus, type: .message))
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func swipeToRusEngChat() {
+        print("in swipe")
+        let vc = ChatRoomViewController(MessageInputView(.rusToEng, type: .message))
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         inputGroup = factory.makeInputGroup(forView: self.view)
@@ -54,15 +58,6 @@ class LanguagesViewController: UIViewController {
     }
     
      
-}
-
-extension UIResponder {
-    func responderChain() -> String {
-        guard let next = next else {
-            return String(describing: self) + "NO"
-        }
-        return String(describing: self) + " -> " + next.responderChain()
-    }
 }
 
 

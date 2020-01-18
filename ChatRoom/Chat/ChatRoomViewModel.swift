@@ -8,9 +8,32 @@
 
 import Foundation
 import UIKit
+import Combine
 
-class ChatRoomViewModel: NSObject {
-    var messages: [Message] = [
+class ChatRoomViewModel: NSObject, ObservableObject {
+//    var messages: [Message] = [
+//        Message(message: "Looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong message!", messageSender: .ourself, username: "Alex"),
+//        Message(message: "Tell me how to get to the library?", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hi", messageSender: .ourself, username: "Alex"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hi", messageSender: .ourself, username: "Alex"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Hi", messageSender: .ourself, username: "Alex"),
+//        Message(message: "Nick has joined", messageSender: .somebody, username: "Nick"),
+//        Message(message: "Alex has joined", messageSender: .somebody, username: "Alex")]
+    var messages = CurrentValueSubject<[Message], Never>([
         Message(message: "Looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong message!", messageSender: .ourself, username: "Alex"),
         Message(message: "Tell me how to get to the library?", messageSender: .somebody, username: "Nick"),
         Message(message: "Hello", messageSender: .somebody, username: "Nick"),
@@ -31,10 +54,11 @@ class ChatRoomViewModel: NSObject {
         Message(message: "Hello", messageSender: .somebody, username: "Nick"),
         Message(message: "Hi", messageSender: .ourself, username: "Alex"),
         Message(message: "Nick has joined", messageSender: .somebody, username: "Nick"),
-        Message(message: "Alex has joined", messageSender: .somebody, username: "Alex")]
+        Message(message: "Alex has joined", messageSender: .somebody, username: "Alex")])
     
     func insertMessage(_ message: Message) {
-        messages.insert(message, at: 0)
+        messages.value.insert(message, at: 0)
+        //messages.send(newMessages)
     }
 }
 
@@ -75,7 +99,10 @@ class ChatRoomViewModel: NSObject {
 extension ChatRoomViewModel: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
+        //return messages.count
+        print(messages.value.count)
+        return messages.value.count
+
     }
 }
 
@@ -84,13 +111,13 @@ extension ChatRoomViewModel: UITableViewDelegate {
         let cell = MessageTableViewCell(style: .default, reuseIdentifier: "MessageCell")
         cell.transform = CGAffineTransform(scaleX: 1, y: -1)
         cell.selectionStyle = .none
-        let message = messages[indexPath.row]
+        let message = messages.value[indexPath.row]
         cell.apply(message: message)
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let height = MessageTableViewCell.height(for: messages[indexPath.row])
+        let height = MessageTableViewCell.height(for: messages.value[indexPath.row])
         return height
     }
     
