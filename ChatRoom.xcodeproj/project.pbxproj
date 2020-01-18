@@ -157,8 +157,8 @@
 				FA8F950B23C0CF50005C0097 /* InputViewPair.swift */,
 				FA7E2C0D23BCDD9600B6EC8F /* MessageTableViewCell.swift */,
 				FA8F950523BF4358005C0097 /* MessageInputView.swift */,
-				FA8F950323BE44E0005C0097 /* Label.swift */,
 				FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */,
+				FA8F950323BE44E0005C0097 /* Label.swift */,
 			);
 			path = VIews;
 			sourceTree = "<group>";
