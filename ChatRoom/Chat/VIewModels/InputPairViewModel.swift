@@ -42,6 +42,8 @@ class InputPairViewModel: NSObject {
         
     
         if recognizer.state == UIGestureRecognizer.State.ended {
+            let recognizerView = recognizer.view as! InputView
+//            UIApplication.shared.sendAction(#selector(LanguagesViewController.swipeToChat(recognizerView.translationType)), to: nil, from: nil, for: nil)
             NotificationCenter.default.post(name: Constants.chatSegue, object: nil, userInfo: ["id" : (recognizer.view as! InputView).translationType])
             UIView.animate(withDuration: 1) {
                 recognizer.view?.center.x = (self.view!.center.x)

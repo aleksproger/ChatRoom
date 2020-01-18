@@ -8,11 +8,7 @@
 
 import UIKit
 
-struct OutputMessage: Codable {
-    var text: String
-    var type: TranslationType
-    var username: String
-}
+
 
 protocol ChatServiceDelegate {
     func receiveMessage(_ notification: Notification)
@@ -23,7 +19,6 @@ class ChatRoomViewController: UIViewController {
     private var lastContentOffset: CGFloat = 0
     private var currentContentInset: UIEdgeInsets = .zero
     private var viewModel = ChatRoomViewModel()
-    //private let chatService = ChatService()
     var tableView = UITableView()
     var messageInputBar = MessageInputView(.engToRus, type: .message)
     
@@ -41,63 +36,6 @@ class ChatRoomViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    var messages: [Message] = [
-        Message(message: "Looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong message!", messageSender: .ourself, username: "Alex"),
-        Message(message: "Tell me how to get to the library?", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hi", messageSender: .ourself, username: "Alex"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hi", messageSender: .ourself, username: "Alex"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello2", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hello", messageSender: .somebody, username: "Nick"),
-        Message(message: "Hi", messageSender: .ourself, username: "Alex"),
-        Message(message: "Nick has joined", messageSender: .somebody, username: "Nick"),
-        Message(message: "Alex has joined", messageSender: .somebody, username: "Alex")]
-    
-}
-
-extension ChatRoomViewController /*UITableViewDelegate, UITableViewDataSource*/ {
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return messages.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = MessageTableViewCell(style: .default, reuseIdentifier: "MessageCell")
-//        cell.transform = CGAffineTransform(scaleX: 1, y: -1)
-//        cell.selectionStyle = .none
-//        let message = messages[indexPath.row]
-//        cell.apply(message: message)
-//        return cell
-//    }
-//
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        let height = MessageTableViewCell.height(for: messages[indexPath.row])
-//        return height
-//    }
-//
-//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
-//    }
-//
-//    func insertNewMessageCell(_ message: Message) {
-//        messages.insert(message, at: 0)
-//        let indexPath = IndexPath(row: 0, section: 0)
-//        tableView.beginUpdates()
-//        tableView.insertRows(at: [indexPath], with: .top)
-//        tableView.endUpdates()
-//        tableView.scrollToRow(at: indexPath, at: .top, animated: true)
-//    }
-    
     func insertNewMessageCell(_ message: Message) {
         viewModel.insertMessage(message)
         tableView.beginUpdates()
@@ -106,39 +44,10 @@ extension ChatRoomViewController /*UITableViewDelegate, UITableViewDataSource*/ 
         tableView.endUpdates()
         tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
-    /*func scrollViewDidScroll(_ scrollView: UIScrollView) {
-     var emptySpaceHeight: CGFloat = 0
-     var y: CGFloat = scrollView.contentSize.height - Constants.footerHeight
-     if (self.lastContentOffset > scrollView.contentOffset.y) {
-     if scrollView.contentSize.height - Constants.footerHeight < scrollView.contentOffset.y {
-     tableView.tableFooterView?.isHidden = true
-     }
-     /*if let lastRow = tableView.indexPathsForVisibleRows?.first {
-     let lastRowFrame = tableView.rectForRow(at: lastRow)
-     emptySpaceHeight = tableView.frame.size.height - (lastRowFrame.origin.y + lastRowFrame.size.height)
-     }*/
-     // move up
-     }
-     else if (self.lastContentOffset < scrollView.contentOffset.y) {
-     if scrollView.contentSize.height - Constants.footerHeight >= scrollView.contentOffset.y {
-     y = scrollView.contentOffset.y + (tableView.frame.height - Constants.footerHeight) - emptySpaceHeight
-     }
-     tableView.tableFooterView?.isHidden = false
-     // move down
-     }
-     
-     // update the new position acquired
-     self.lastContentOffset = scrollView.contentOffset.y
-     //let y = Constants.footerHeight + (scrollView.contentOffset.y - Constants.footerHeight) + 414.0
-     //let y = scrollView.contentOffset.y + (tableView.frame.height - Constants.footerHeight)
-     print(scrollView.contentOffset.y)
-     let height: CGFloat = 52.0
-     tableView.tableFooterView?.frame = CGRect(x: 0, y: y
-     , width: UIScreen.main.bounds.size.width, height: height)
-     }*/
     
     
 }
+
 
 extension ChatRoomViewController {
     override func viewDidLoad() {
@@ -148,7 +57,6 @@ extension ChatRoomViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_:)), name: Constants.msgReceived, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(receiveJoinMessage(_:)), name: Constants.joinMsgReceived, object: nil)
         self.view.addGestureRecognizer(UISwipeGestureRecognizer(target: self, action: #selector(swipeBack(recognizer:))))
-        //ChatService.shared.writeMessage("Zdarova")
         ChatService.shared.joinChat(username: "Alex")
         loadViews()
     }
@@ -168,57 +76,54 @@ extension ChatRoomViewController {
     @objc func keyboardWillChange(notification: NSNotification) {
         keyboardIsShown.toggle()
         print("now keyboard is", keyboardIsShown)
-        let safeArea = view.safeAreaLayoutGuide
-        if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)!.cgRectValue
-            print(endFrame.minY, safeArea.layoutFrame.maxY)
-            if keyboardIsShown &&  (safeArea.layoutFrame.maxY <= endFrame.minY) {
-                keyboardIsShown = false
-            } else if !keyboardIsShown && (safeArea.layoutFrame.maxY > endFrame.minY) {
-                keyboardIsShown = true
+        guard let endFrame = processKeyboardNotification(notification) else {
+            return
+        }
+        let messageBarHeight = self.messageInputBar.bounds.size.height
+        var insets = view.safeAreaInsets
+        // To make inpit view 16px higher of phone frame when device lower than iphone X
+        if insets.bottom == 0 {
+            insets.bottom = 16
+        }
+        let point = CGPoint(x: self.messageInputBar.center.x, y: endFrame.origin.y - messageBarHeight/2.0 - (keyboardIsShown ? 16 : insets.bottom))
+        print(insets.bottom)
+        let inset = UIEdgeInsets(top: (keyboardIsShown ? (endFrame.size.height - insets.bottom + 16) : 0), left: 0, bottom: 0, right: 0)
+        animateKeyboardAppearance(point: point, inset: inset)
+        
+    }
+    
+    func animateKeyboardAppearance(point: CGPoint, inset: UIEdgeInsets) {
+        UIView.animate(withDuration: 0.25) {
+            self.messageInputBar.center = point
+            self.tableView.contentInset = inset
+            if self.tableView.numberOfSections != 0 && self.tableView.numberOfRows(inSection: 0) != 0  && self.tableView.contentInset.top != 0{
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
             }
-            let messageBarHeight = self.messageInputBar.bounds.size.height
-            var insets = view.safeAreaInsets
-            if insets.bottom == 0 {
-                insets.bottom = 16
-            }
-            
-            let point = CGPoint(x: self.messageInputBar.center.x, y: endFrame.origin.y - messageBarHeight/2.0 - (keyboardIsShown ? 16 : insets.bottom))
-            print(insets.bottom)
-            let inset = UIEdgeInsets(top: (keyboardIsShown ? (endFrame.size.height - insets.bottom + 16) : 0), left: 0, bottom: 0, right: 0)
-            print(inset)
-            UIView.animate(withDuration: 0.25) {
-                self.messageInputBar.center = point
-                self.tableView.contentInset = inset
-                if self.tableView.numberOfSections != 0 && self.tableView.numberOfRows(inSection: 0) != 0  && self.tableView.contentInset.top != 0{
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
-                }
-            }
-            
         }
     }
     
-    /* @objc func microButtonTapped() {
-     /*messageInputBar.clearButton.isHidden = true
-     messageInputBar.sendButton.isHidden = true
-     messageInputBar.micButton.isHidden = true
-     messageInputBar.recordButton.isHidden = false
-     messageInputBar.textField.text = "Говорите..."*/
-     messageInputBar.viewModel?.microButtonTapped()
-     }
-     
-     @objc func recordButtonTapped() {
-     messageInputBar.clearButton.isHidden = true
-     messageInputBar.sendButton.isHidden = true
-     messageInputBar.micButton.isHidden = false
-     messageInputBar.recordButton.isHidden = true
-     messageInputBar.textField.text = "Английский"
-     }
-     
-     @objc func clearButtonTapped() {
-     messageInputBar.textField.text = ""
-     }*/
+    func processKeyboardNotification(_ notification: NSNotification) -> CGRect? {
+        guard let userInfo = notification.userInfo else {
+            return nil
+        }
+        let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)!.cgRectValue
+        //print(endFrame.minY, safeArea.layoutFrame.maxY)
+        keyboardIsShown = isKeyboardReallyShown(keyboardFrame: endFrame)
+        return endFrame
+        
+    }
     
+    func isKeyboardReallyShown(keyboardFrame: CGRect) -> Bool {
+        let safeArea = view.safeAreaLayoutGuide
+        if keyboardIsShown &&  (safeArea.layoutFrame.maxY <= keyboardFrame.minY) {
+            return false
+        } else if !keyboardIsShown && (safeArea.layoutFrame.maxY > keyboardFrame.minY) {
+            return true
+        }
+        
+        return keyboardIsShown
+    }
+
     // Adding new views to ierarchy and give content to existing
     func loadViews() {
         navigationController?.navigationBar.isHidden = true

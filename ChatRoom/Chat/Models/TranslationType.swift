@@ -9,6 +9,7 @@
 import Foundation
 
 enum TranslationType: String, Codable {
+    
     case engToRus
     case rusToEng
 }
@@ -16,4 +17,10 @@ enum TranslationType: String, Codable {
 enum InputType {
     case message
     case translation
+}
+
+struct OutputMessage: Codable {
+    var text: String
+    var type: TranslationType
+    var username: String
 }

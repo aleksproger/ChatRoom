@@ -10,20 +10,19 @@ import UIKit
 
 class LanguagesViewController: UIViewController {
 
-    let inputGroup0 = InputViewPair()
+    let inputGroup = InputViewPair()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(swipeToChat(_ :)), name: Constants.chatSegue, object: nil)
         loadViews()
-        //manager.translate(.rusToEng, text: "Thing")
-        // Do any additional setup after loading the view.
+
     }
     
     func loadViews() {
         navigationController?.navigationBar.isHidden = true
         view.backgroundColor = .white
-        view.addSubview(inputGroup0)
+        view.addSubview(inputGroup)
     }
     
     @objc func swipeToChat(_ notification: Notification) {
@@ -32,10 +31,16 @@ class LanguagesViewController: UIViewController {
             let vc = ChatRoomViewController(MessageInputView(id, type: .message))
             self.navigationController?.pushViewController(vc, animated: true)
         }
-
         
     }
     
+//    @objc func swipeToChat(_ translationType: TranslationType) {
+//        print("In segue")
+//            let vc = ChatRoomViewController(MessageInputView(translationType, type: .message))
+//            self.navigationController?.pushViewController(vc, animated: true)
+//        
+//        
+//    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         var insets = view.safeAreaInsets
@@ -45,8 +50,8 @@ class LanguagesViewController: UIViewController {
             insets.bottom = 0
         }
         print(insets.top)
-        inputGroup0.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: 2 * 44 + 40)
-        inputGroup0.center = CGPoint(x: inputGroup0.bounds.size.width/2.0, y: inputGroup0.bounds.height/2.0 + insets.top + 15)
+        inputGroup.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: 2 * 44 + 40)
+        inputGroup.center = CGPoint(x: inputGroup.bounds.size.width/2.0, y: inputGroup.bounds.height/2.0 + insets.top + 15)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

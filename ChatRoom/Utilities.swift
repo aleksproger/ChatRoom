@@ -28,6 +28,10 @@ struct Constants {
     static let msgSendTapped = Notification.Name("msgSendTapped")
     static let msgReceived = Notification.Name("msgReceived")
     static let joinMsgReceived = Notification.Name("joinMsgReceived")
+    
+    static let engRusColors = ["ourself" : messageBlueColor, "somebody" : messageRedColor]
+    static let rusEngColors = ["ourself" : messageRedColor, "somebody" : messageBlueColor]
+
 }
 
 struct GlobalVariables {
