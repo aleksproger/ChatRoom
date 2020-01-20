@@ -63,13 +63,16 @@ extension ChatRoomViewController {
         super.viewDidLoad()
         
         viewModel.messages
-            .handleEvents { messages in
+            .handleEvents(receiveOutput: { messages in
+                print("in sink")
                 self.updateTableView()
-        }
+        })
         .ignoreOutput()
         .sink { (_) in}
         .store(in: &subscriptions)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(sendMessage(_ :)), name: Constants.msgSendTapped, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_:)), name: Constants.msgReceived, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(receiveJoinMessage(_:)), name: Constants.joinMsgReceived, object: nil)
@@ -124,7 +127,6 @@ extension ChatRoomViewController {
             return nil
         }
         let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)!.cgRectValue
-        //print(endFrame.minY, safeArea.layoutFrame.maxY)
         keyboardIsShown = isKeyboardReallyShown(keyboardFrame: endFrame)
         return endFrame
         
@@ -194,7 +196,9 @@ extension ChatRoomViewController: ChatServiceDelegate {
         if let data = notification.userInfo as? [String : Message], let message = data["message"] {
             //let message = Message(message: text, messageSender: .ourself, username: "Alex")
             if message.message != "" {
-                self.insertNewMessageCell(message)
+                DispatchQueue.main.async {
+                    self.viewModel.insertMessage(message)
+                }
             }
         }
     }
@@ -205,7 +209,7 @@ extension ChatRoomViewController: ChatServiceDelegate {
             if msg.withoutWhitespace() != "" {
                 let message = Message(message: msg, messageSender: .somebody, username: "System")
                 DispatchQueue.main.async {
-                    self.insertNewMessageCell(message)
+                    self.viewModel.insertMessage(message)
                 }
             }
         }
@@ -218,6 +222,7 @@ extension ChatRoomViewController: ChatServiceDelegate {
                 //self.insertNewMessageCell(message)
                 
                 //ChatService.shared.writeMessage(message.message)
+                //insertNewMessageCell(Message(message: "lol", messageSender: .ourself, username: "Alex"))
                 ChatService.shared.sendMessaage(OutputMessage(text: text, type: messageInputBar.translationType, username: "Alex"))
             }
         }

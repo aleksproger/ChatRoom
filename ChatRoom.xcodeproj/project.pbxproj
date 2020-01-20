@@ -32,6 +32,7 @@
 		FA8F951323C22781005C0097 /* TranslationInputViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951223C22781005C0097 /* TranslationInputViewModel.swift */; };
 		FA8F951523C3CFF6005C0097 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951423C3CFF6005C0097 /* ChatService.swift */; };
 		FA8F951723C3D367005C0097 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F951623C3D367005C0097 /* APIManager.swift */; };
+		FAD4469D23D58ECB009F030B /* LanguagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD4469C23D58ECB009F030B /* LanguagesViewModel.swift */; };
 		FAE529D323C3D96500980197 /* TranslationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE529D223C3D96500980197 /* TranslationRequest.swift */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +66,7 @@
 		FA8F951223C22781005C0097 /* TranslationInputViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationInputViewModel.swift; sourceTree = "<group>"; };
 		FA8F951423C3CFF6005C0097 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		FA8F951623C3D367005C0097 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
+		FAD4469C23D58ECB009F030B /* LanguagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagesViewModel.swift; sourceTree = "<group>"; };
 		FAE529D223C3D96500980197 /* TranslationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,6 +139,7 @@
 				FA7E2C0323BCDA4500B6EC8F /* Info.plist */,
 				FA3900BC23CC672E00CB9B20 /* Other */,
 				FA7E2C1023BD07D900B6EC8F /* Utilities.swift */,
+				FAD4469C23D58ECB009F030B /* LanguagesViewModel.swift */,
 			);
 			path = ChatRoom;
 			sourceTree = "<group>";
@@ -320,6 +323,7 @@
 				FA7E2C1123BD07D900B6EC8F /* Utilities.swift in Sources */,
 				FA7E2C0C23BCDD6B00B6EC8F /* Message.swift in Sources */,
 				FA7E2BFD23BCDA4300B6EC8F /* ChatRoom.xcdatamodeld in Sources */,
+				FAD4469D23D58ECB009F030B /* LanguagesViewModel.swift in Sources */,
 				FA7E2BF523BCDA4300B6EC8F /* SceneDelegate.swift in Sources */,
 				FAE529D323C3D96500980197 /* TranslationRequest.swift in Sources */,
 				FA098AA523D3232E00AB8AE9 /* ChatRoomViewModel.swift in Sources */,

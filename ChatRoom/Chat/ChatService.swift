@@ -23,6 +23,7 @@ class ChatService {
         }
         socket.delegate = self
         socket.connect()
+        print("connected")
     }
     
     func joinChat(username: String)  {

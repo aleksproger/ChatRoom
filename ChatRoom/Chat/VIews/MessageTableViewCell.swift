@@ -38,7 +38,7 @@ class MessageTableViewCell: UITableViewCell {
             messageText.setAttributes([NSAttributedString.Key.font: UIFont(name: Constants.chatFont, size: 15)!,
                                        NSAttributedString.Key.foregroundColor: UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 0.8)], range: NSMakeRange(0, message.message.count))
         }
-        print(NSMakeRange(message.translatedMessage.count, messageText.string.count))
+        //print(NSMakeRange(message.translatedMessage.count, messageText.string.count))
 
         messageLabel.attributedText = messageText
         messageSender = message.messageSender
