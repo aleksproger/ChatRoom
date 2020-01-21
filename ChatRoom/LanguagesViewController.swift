@@ -14,9 +14,9 @@ class LanguagesViewController: UIViewController {
     
     var inputGroup: InputViewPair?
     let factory = LanguagesVCFactory()
+    var subscriptions = Set<AnyCancellable>()
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(swipeToChat(_ :)), name: Constants.chatSegue, object: nil)
         loadViews()
 
     }
@@ -26,36 +26,28 @@ class LanguagesViewController: UIViewController {
         view.backgroundColor = .white
     }
     
-    @objc func swipeToChat(_ notification: Notification) {
-        print("In segue")
-        if let data = notification.userInfo as? [String : TranslationType], let id = data["id"] {
-            let vc = ChatRoomViewController(MessageInputView(id, type: .message))
-            self.navigationController?.pushViewController(vc, animated: true)
-        }
+    func swipeToChat(translationType: TranslationType) {
+        let vc = ChatRoomViewController(MessageInputView(translationType))
+        self.navigationController?.pushViewController(vc, animated: true)
         
-    }
-    
-    @objc func swipeToEngRusChat() {
-        print("in swipe")
-        let vc = ChatRoomViewController(MessageInputView(.engToRus, type: .message))
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    @objc func swipeToRusEngChat() {
-        print("in swipe")
-        let vc = ChatRoomViewController(MessageInputView(.rusToEng, type: .message))
-        self.navigationController?.pushViewController(vc, animated: true)
+        
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         inputGroup = factory.makeInputGroup(forView: self.view)
+        inputGroup?.swipeMade
+            .sink { translationType in
+                self.swipeToChat(translationType: translationType)
+        }
+        .store(in: &subscriptions)
         view.addSubview(inputGroup!)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         print("Touch registered")
-        UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
+        //self.view.becomeFirstResponder()
+        UIApplication.shared.sendAction(#selector(TranslationInputView.setDefaultMode), to: nil, from: nil, for: nil)
     }
     
      
@@ -64,7 +56,7 @@ class LanguagesViewController: UIViewController {
 
 class LanguagesVCFactory {
     func makeInputGroup(forView view: UIView) -> InputViewPair {
-        let inputGroup = InputViewPair()
+        let inputGroup = InputViewPair(InputPairViewModel())
         var insets = view.safeAreaInsets
         if insets.bottom == 0 {
             insets.bottom = 16

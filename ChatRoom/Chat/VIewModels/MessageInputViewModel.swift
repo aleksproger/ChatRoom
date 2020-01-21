@@ -12,7 +12,7 @@ import Combine
 import Speech
 
 
-class MessageInputViewModel: NSObject, MessageInputDelegate {
+class MessageInputViewModel: NSObject{
     
     private weak var view: MessageInputView?
     private var speechRecognition: Recognition!
@@ -23,40 +23,40 @@ class MessageInputViewModel: NSObject, MessageInputDelegate {
     }
 
     
-    @objc func microButtonTapped() {
-        speechRecognition.startRecording() { isAuthorized in
-            if isAuthorized {
-                DispatchQueue.main.async {
-                    print("Authorized")
-                    self.view?.clearButton.isHidden = true
-                    self.view?.sendButton.isHidden = true
-                    self.view?.micButton.isHidden = true
-                    self.view?.recordButton.isHidden = false
-                    self.view?.textField.text = "Говорите..."
-                }
-            }
-        }
-
-    }
-    
-    @objc func recordButtonTapped() {
-        speechRecognition.stopRecording()
-        view?.clearButton.isHidden = true
-        view?.sendButton.isHidden = true
-        view?.micButton.isHidden = false
-        view?.recordButton.isHidden = true
-        view?.textField.text = "Английский"
-    }
-    
-    @objc func clearButtonTapped() {
-        view?.textField.text = ""
-    }
-    
-    @objc func sendButtonTapped() {
-        NotificationCenter.default.post(name: Constants.msgSendTapped, object: nil, userInfo: ["text" : view!.textField.text!])
-        print("Pos notification about send")
-        setTypingMode()
-    }
+//    @objc func microButtonTapped() {
+//        speechRecognition.startRecording() { isAuthorized in
+//            if isAuthorized {
+//                DispatchQueue.main.async {
+//                    print("Authorized")
+//                    self.view?.clearButton.isHidden = true
+//                    self.view?.sendButton.isHidden = true
+//                    self.view?.micButton.isHidden = true
+//                    self.view?.recordButton.isHidden = false
+//                    self.view?.textField.text = "Говорите..."
+//                }
+//            }
+//        }
+//
+//    }
+//
+//    @objc func recordButtonTapped() {
+//        speechRecognition.stopRecording()
+//        view?.clearButton.isHidden = true
+//        view?.sendButton.isHidden = true
+//        view?.micButton.isHidden = false
+//        view?.recordButton.isHidden = true
+//        view?.textField.text = "Английский"
+//    }
+//
+//    @objc func clearButtonTapped() {
+//        view?.textField.text = ""
+//    }
+//
+//    @objc func sendButtonTapped() {
+//        NotificationCenter.default.post(name: Constants.msgSendTapped, object: nil, userInfo: ["text" : view!.textField.text!])
+//        print("Pos notification about send")
+//        setTypingMode()
+//    }
     
 }
 

@@ -10,7 +10,9 @@ import UIKit
 import Combine
 
 protocol ChatServiceDelegate {
-    func receiveMessage(_ notification: Notification)
+    func receiveMessage(message: Message)
+    func receiveJoinMessage(message: String)
+    func sendMessage(message: String)
 }
 
 class ChatRoomViewController: UIViewController {
@@ -20,7 +22,7 @@ class ChatRoomViewController: UIViewController {
     private var viewModel = ChatRoomViewModel()
     private var subscriptions = Set<AnyCancellable>()
     var tableView = UITableView()
-    var messageInputBar = MessageInputView(.engToRus, type: .message)
+    var messageInputBar = MessageInputView(.engToRus)
     
     init(_ inputBar: MessageInputView, chatService: ChatService = ChatService.shared) {
         self.messageInputBar = inputBar
@@ -71,11 +73,30 @@ extension ChatRoomViewController {
         .sink { (_) in}
         .store(in: &subscriptions)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        messageInputBar.sendTapped
+            .sink { text in
+                print("in send button sink")
+                self.sendMessage(message: text)
+        }
+        .store(in: &subscriptions)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(sendMessage(_ :)), name: Constants.msgSendTapped, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(receiveMessage(_:)), name: Constants.msgReceived, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(receiveJoinMessage(_:)), name: Constants.joinMsgReceived, object: nil)
+        ChatService.shared.messageReceived
+            .sink { message in
+                self.receiveMessage(message: message)
+        }
+        .store(in: &subscriptions)
+        
+        ChatService.shared.joinMessageReceived
+            .sink { text in
+                self.receiveJoinMessage(message: text)
+        }
+        .store(in: &subscriptions)
+        
+        NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification).sink { (notification) in
+            self.keyboardWillChange(notification: notification)
+        }
+        .store(in: &subscriptions)
+        
         self.view.addGestureRecognizer(UISwipeGestureRecognizer(target: self, action: #selector(swipeBack(recognizer:))))
         ChatService.shared.joinChat(username: "Alex")
         loadViews()
@@ -93,9 +114,8 @@ extension ChatRoomViewController {
         }
     }
     
-    @objc func keyboardWillChange(notification: NSNotification) {
+    @objc func keyboardWillChange(notification: Notification) {
         keyboardIsShown.toggle()
-        print("now keyboard is", keyboardIsShown)
         guard let endFrame = processKeyboardNotification(notification) else {
             return
         }
@@ -106,7 +126,7 @@ extension ChatRoomViewController {
             insets.bottom = 16
         }
         let point = CGPoint(x: self.messageInputBar.center.x, y: endFrame.origin.y - messageBarHeight/2.0 - (keyboardIsShown ? 16 : insets.bottom))
-        print(insets.bottom)
+//        print(insets.bottom)
         let inset = UIEdgeInsets(top: (keyboardIsShown ? (endFrame.size.height - insets.bottom + 16) : 0), left: 0, bottom: 0, right: 0)
         animateKeyboardAppearance(point: point, inset: inset)
         
@@ -122,7 +142,7 @@ extension ChatRoomViewController {
         }
     }
     
-    func processKeyboardNotification(_ notification: NSNotification) -> CGRect? {
+    func processKeyboardNotification(_ notification: Notification) -> CGRect? {
         guard let userInfo = notification.userInfo else {
             return nil
         }
@@ -192,39 +212,29 @@ extension ChatRoomViewController {
 }
 
 extension ChatRoomViewController: ChatServiceDelegate {
-    @objc func receiveMessage(_ notification: Notification) {
-        if let data = notification.userInfo as? [String : Message], let message = data["message"] {
-            //let message = Message(message: text, messageSender: .ourself, username: "Alex")
-            if message.message != "" {
-                DispatchQueue.main.async {
-                    self.viewModel.insertMessage(message)
-                }
+
+    func receiveJoinMessage(message: String) {
+        if message.withoutWhitespace() != "" {
+            let message = Message(message: message, messageSender: .somebody, username: "System")
+            DispatchQueue.main.async {
+                self.viewModel.insertMessage(message)
             }
         }
     }
     
-    @objc func receiveJoinMessage(_ notification: Notification) {
-        if let data = notification.userInfo as? [String : String], let msg = data["text"] {
-            //let message = Message(message: text, messageSender: .ourself, username: "Alex")
-            if msg.withoutWhitespace() != "" {
-                let message = Message(message: msg, messageSender: .somebody, username: "System")
-                DispatchQueue.main.async {
-                    self.viewModel.insertMessage(message)
-                }
+    func receiveMessage(message: Message) {
+        if message.message != "" {
+            DispatchQueue.main.async {
+                self.viewModel.insertMessage(message)
             }
         }
     }
     
-    @objc func sendMessage(_ notification: Notification) {
-        if let data = notification.userInfo as? [String : Any], let text = data["text"] as? String {
-            //let message = Message(message: text, messageSender: .ourself, username: "Alex")
-            if text.withoutWhitespace() != "" {
-                //self.insertNewMessageCell(message)
-                
-                //ChatService.shared.writeMessage(message.message)
-                //insertNewMessageCell(Message(message: "lol", messageSender: .ourself, username: "Alex"))
-                ChatService.shared.sendMessaage(OutputMessage(text: text, type: messageInputBar.translationType, username: "Alex"))
-            }
+    func sendMessage(message: String) {
+        if message.withoutWhitespace() != "" {
+            //ChatService.shared.writeMessage(message.message)
+            //insertNewMessageCell(Message(message: "lol", messageSender: .ourself, username: "Alex"))
+            ChatService.shared.sendMessaage(OutputMessage(text: message, type: messageInputBar.translationType, username: "Alex"))
         }
     }
     

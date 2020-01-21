@@ -8,6 +8,7 @@
 
 import Foundation
 import Starscream
+import Combine
 
 class ChatService {
     private var isConnected = false
@@ -15,6 +16,9 @@ class ChatService {
     static let shared = ChatService()
     private var username = "Alex"
     private init () {}
+    var messageReceived = PassthroughSubject<Message, Never>()
+    var joinMessageReceived = PassthroughSubject<String, Never>()
+    
     func setupNetworkCommunication() {
         let request = URLRequest(url: URL(string: "ws://localhost:8080/echo-test")!)
         socket = WebSocket(request: request)
@@ -52,20 +56,16 @@ class ChatService {
     }
     
     func receiveJoinMessage(text: String) {
-        NotificationCenter.default.post(name: Constants.joinMsgReceived, object: nil, userInfo:  ["text" : text])
+        joinMessageReceived.send(text)
     }
     
     func receiveMessageObject(data: Data) {
-        var message = try? JSONDecoder.init().decode(Message.self, from: data)
-        guard message != nil else {
+        let messageDecoded = try? JSONDecoder.init().decode(Message.self, from: data)
+        guard var message = messageDecoded else {
             return
         }
-        if message!.senderUsername == self.username {
-            message!.messageSender = .ourself
-        } else {
-            message!.messageSender = .somebody
-        }
-        NotificationCenter.default.post(name: Constants.msgReceived, object: nil, userInfo:  ["message" : message!])
+        message.messageSender = (message.senderUsername == self.username) ? .ourself : .somebody
+        messageReceived.send(message)
 
     }
     

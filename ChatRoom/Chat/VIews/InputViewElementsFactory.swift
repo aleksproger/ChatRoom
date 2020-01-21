@@ -11,7 +11,7 @@ import UIKit
 
 class Factory {
     
-    func makeFlagsView(_ translationType: TranslationType, forView view: InputView) -> UIView{
+    func makeFlagsView(_ translationType: TranslationType, forView view: UIView) -> UIView{
         let rusImageView = UIImageView(image: UIImage(named: "rus"))
         let engImageView = UIImageView(image: UIImage(named: "eng"))
         let imagesContainerView = UIView()
@@ -48,7 +48,7 @@ class Factory {
         return imagesContainerView
     }
     
-    func makeShadowView(forView view: InputView) -> UIView {
+    func makeShadowView(forView view: TranslationInputView) -> UIView {
         let shadows = UIView()
         shadows.frame = view.bounds
         shadows.center = CGPoint(x: view.frame.size.width/2.0 , y: shadows.bounds.size.height/2.0)
@@ -69,7 +69,7 @@ class Factory {
         return shadows
     }
     
-    func makeSendButton(forView view: InputView) -> UIButton {
+    func makeSendButton(forView view: UIView) -> UIButton {
         let sendButton = UIButton()
         sendButton.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
         sendButton.center = CGPoint(x: view.bounds.maxX - 14 - sendButton.bounds.width/2.0, y: view.bounds.height/2.0)
@@ -78,7 +78,7 @@ class Factory {
         return sendButton
     }
     
-    func makeClearButton(forView view: InputView) -> UIButton {
+    func makeClearButton(forView view: UIView) -> UIButton {
         let clearButton = UIButton()
         clearButton.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
         clearButton.center = CGPoint(x: view.bounds.maxX - 46 - clearButton.bounds.width/2.0, y: view.bounds.height/2.0)
@@ -87,7 +87,7 @@ class Factory {
         return clearButton
     }
     
-    func makeMicButton(forView view: InputView) -> UIButton {
+    func makeMicButton(forView view: UIView) -> UIButton {
         let micButton = UIButton()
         micButton.frame = CGRect(x: 0, y: 0, width: 12, height: 16)
         micButton.center = CGPoint(x: view.bounds.maxX - 16 - micButton.bounds.width/2.0, y: view.bounds.height/2.0)
@@ -95,7 +95,7 @@ class Factory {
         return micButton
     }
     
-    func makeRecordButton(forView view: InputView) -> UIButton {
+    func makeRecordButton(forView view: UIView) -> UIButton {
         let recordButton = UIButton()
         recordButton.frame = CGRect(x: 0, y: 0, width: 18, height: 16)
         recordButton.center = CGPoint(x: view.bounds.maxX - 16 - recordButton.bounds.width/2.0, y: view.bounds.height/2.0)
@@ -104,7 +104,7 @@ class Factory {
         return recordButton
     }
     
-    func makeTextField(forView view: InputView) -> UITextField {
+    func makeTextField(forView view: TranslationInputView) -> UITextField {
         let textField = UITextField()
         textField.frame = CGRect(x: 0, y: 0, width: view.bounds.width - 62 - 56, height: 20.0)
         textField.center = CGPoint(x: view.bounds.minX + 56 + textField.bounds.width/2.0, y: view.bounds.height/2.0)

@@ -11,6 +11,7 @@
 		FA098AA123D1FE6100AB8AE9 /* TranslationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA098AA023D1FE6100AB8AE9 /* TranslationType.swift */; };
 		FA098AA323D31EA100AB8AE9 /* InputViewElementsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */; };
 		FA098AA523D3232E00AB8AE9 /* ChatRoomViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA098AA423D3232E00AB8AE9 /* ChatRoomViewModel.swift */; };
+		FA2A8FE123D5AD8500D2B18A /* TranslationInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2A8FE023D5AD8500D2B18A /* TranslationInputView.swift */; };
 		FA3900BE23CDFBB700CB9B20 /* SpeechRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3900BD23CDFBB700CB9B20 /* SpeechRecognition.swift */; };
 		FA7E2BF323BCDA4300B6EC8F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7E2BF223BCDA4300B6EC8F /* AppDelegate.swift */; };
 		FA7E2BF523BCDA4300B6EC8F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7E2BF423BCDA4300B6EC8F /* SceneDelegate.swift */; };
@@ -43,6 +44,7 @@
 		FA098AA023D1FE6100AB8AE9 /* TranslationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationType.swift; sourceTree = "<group>"; };
 		FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewElementsFactory.swift; sourceTree = "<group>"; };
 		FA098AA423D3232E00AB8AE9 /* ChatRoomViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomViewModel.swift; sourceTree = "<group>"; };
+		FA2A8FE023D5AD8500D2B18A /* TranslationInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationInputView.swift; sourceTree = "<group>"; };
 		FA3900BD23CDFBB700CB9B20 /* SpeechRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognition.swift; sourceTree = "<group>"; };
 		FA7E2BEF23BCDA4300B6EC8F /* ChatRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA7E2BF223BCDA4300B6EC8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				FA8F950523BF4358005C0097 /* MessageInputView.swift */,
 				FA098AA223D31EA100AB8AE9 /* InputViewElementsFactory.swift */,
 				FA8F950323BE44E0005C0097 /* Label.swift */,
+				FA2A8FE023D5AD8500D2B18A /* TranslationInputView.swift */,
 			);
 			path = VIews;
 			sourceTree = "<group>";
@@ -317,6 +320,7 @@
 			files = (
 				FA8F951723C3D367005C0097 /* APIManager.swift in Sources */,
 				FA8F950C23C0CF50005C0097 /* InputViewPair.swift in Sources */,
+				FA2A8FE123D5AD8500D2B18A /* TranslationInputView.swift in Sources */,
 				FA7E2BF723BCDA4300B6EC8F /* ChatRoomViewController.swift in Sources */,
 				FA7E2BF323BCDA4300B6EC8F /* AppDelegate.swift in Sources */,
 				FA098AA123D1FE6100AB8AE9 /* TranslationType.swift in Sources */,

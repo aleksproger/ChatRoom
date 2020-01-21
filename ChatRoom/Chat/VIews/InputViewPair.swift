@@ -7,23 +7,33 @@
 //
 
 import UIKit
+import Combine
 
 class InputViewPair: UIView {
 
-    private(set) var topView = MessageInputView(.engToRus, type: .translation)
-    private(set) var bottomView = MessageInputView(.rusToEng, type: .translation)
+    private(set) var topView = TranslationInputView(.engToRus, viewModel: TranslationInputViewModel())
+    private(set) var bottomView = TranslationInputView(.rusToEng, viewModel: TranslationInputViewModel())
+    
+    var subscriptions = Set<AnyCancellable>()
+    var swipeMade = PassthroughSubject<TranslationType, Never>()
     var viewModel: InputPairViewModel?
+    convenience init(_ viewModel: InputPairViewModel) {
+        self.init(frame: .zero)
+        self.viewModel = viewModel
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.viewModel = InputPairViewModel(self)
+        //self.viewModel = InputPairViewModel()
         addSubview(topView)
         addSubview(bottomView)
-        NotificationCenter.default.addObserver(self, selector: #selector(sendTapped(_:)), name: Constants.sendTapped, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(clearTapped(_:)), name: Constants.clearTapped, object: nil)
+        subscribeToSendTap()
+        subscribeToClearTap()
         bottomView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(recognizer:))))
         topView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(recognizer:))))
     }
     
+
     override func layoutSubviews() {
         let insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         topView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: 44)
@@ -42,20 +52,10 @@ class InputViewPair: UIView {
             return
         }
         moveTheView(recognizer: recognizer)
-        
-        
         if recognizer.state == UIGestureRecognizer.State.ended {
-            let recognizerView = recognizer.view as! InputView
-            print("Need transition")
-            switch recognizerView.translationType {
-            case .engToRus:
-                print("send action")
-                UIApplication.shared.sendAction(#selector(LanguagesViewController.swipeToEngRusChat), to: nil, from: nil, for: nil)
-            case .rusToEng:
-                print("send action")
-                UIApplication.shared.sendAction(#selector(LanguagesViewController.swipeToRusEngChat), to: nil, from: nil, for: nil)
-            }
-            NotificationCenter.default.post(name: Constants.chatSegue, object: nil, userInfo: ["id" : (recognizer.view as! InputView).translationType])
+            let recognizerView = recognizer.view as! TranslationInputView
+
+            swipeMade.send(recognizerView.translationType)
             UIView.animate(withDuration: 1) {
                 recognizer.view?.center.x = (self.center.x)
             }
@@ -95,52 +95,43 @@ class InputViewPair: UIView {
         guard velocity.x < 0 && magnitude > 700 else {
             return false
         }
-        print(magnitude)
         return true
     }
     
-    @objc func sendTapped(_ notification: Notification) {
-        if let data = notification.userInfo as? [String : TranslationType], let id = data["id"] {
-            if id == .engToRus {
-                self.bottomView.viewModel?.setTypingMode()
-                let textForTranslation = self.topView.textField.text ?? ""
-                viewModel?.manager.translate(.engToRus, text: textForTranslation) { translation in
-                    DispatchQueue.main.async {
-                        self.bottomView.textField.text = translation
-                    }
+    func subscribeToSendTap() {
+        topView.sendTapped.sink { _ in
+            self.bottomView.setTypingMode()
+            let textForTranslation = self.topView.textField.text ?? ""
+            self.viewModel?.manager.translate(.engToRus, text: textForTranslation) { translation in
+                DispatchQueue.main.async {
+                    self.bottomView.textField.text = translation
                 }
-                
-            } else {
-                self.topView.viewModel?.setTypingMode()
-                let textForTranslation = self.bottomView.textField.text ?? ""
-                viewModel?.manager.translate(.rusToEng, text: textForTranslation) { translation in
-                    DispatchQueue.main.async {
-                        self.topView.textField.text = translation
-                    }
-                    
-                }
-                //                view?.topView.textField.text = view?.bottomView.textField.text
-                
-                
             }
         }
+        .store(in: &subscriptions)
+        bottomView.sendTapped.sink { _ in
+            self.topView.setTypingMode()
+            let textForTranslation = self.bottomView.textField.text ?? ""
+            self.viewModel?.manager.translate(.rusToEng, text: textForTranslation) { translation in
+                DispatchQueue.main.async {
+                    self.topView.textField.text = translation
+                }
+            }
+        }
+        .store(in: &subscriptions)
     }
     
-    @objc func clearTapped(_ notification: Notification) {
-        if let data = notification.userInfo as? [String : TranslationType], let id = data["id"] {
-            if id == .engToRus {
-                self.bottomView.setDefaultMode()
-                self.bottomView.textField.endEditing(true)
-                
-                //view?.bottomView.textField.text = ""
-                
-            } else {
-                self.topView.setDefaultMode()
-                self.topView.textField.endEditing(true)
-                
-                //view?.topView.textField.text = ""
-            }
+    func subscribeToClearTap() {
+        topView.clearTapped.sink { _ in
+            self.bottomView.setDefaultMode()
+            self.bottomView.textField.endEditing(true)
         }
+        .store(in: &subscriptions)
+        bottomView.sendTapped.sink { _ in
+            self.topView.setDefaultMode()
+            self.topView.textField.endEditing(true)
+        }
+        .store(in: &subscriptions)
     }
     
 }
