@@ -13,11 +13,10 @@ enum MessageSender: String, Codable {
     case server
 }
 
-
 class MessageTableViewCell: UITableViewCell {
     
     var messageSender: MessageSender = .somebody
-    let messageLabel = Label()
+    let messageLabel = MessageLabel()
     let nameLabel = UILabel()
     private var isJoinMessage = false
     
@@ -38,11 +37,8 @@ class MessageTableViewCell: UITableViewCell {
             messageText.setAttributes([NSAttributedString.Key.font: UIFont(name: Constants.chatFont, size: 15)!,
                                        NSAttributedString.Key.foregroundColor: UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 0.8)], range: NSMakeRange(0, message.message.count))
         }
-        //print(NSMakeRange(message.translatedMessage.count, messageText.string.count))
-
         messageLabel.attributedText = messageText
         messageSender = message.messageSender
-        //translationLabel.text = message.translatedMessage
         setNeedsLayout()
     }
     
@@ -107,37 +103,24 @@ extension MessageTableViewCell {
     }
     
     func layoutForMyMessage() {
-       // print("In ourself layout")
         nameLabel.isHidden = true
         messageLabel.center = CGPoint(x: bounds.size.width - messageLabel.frame.width/2 - 16, y: bounds.size.height/2)
-         //messageLabel.backgroundColor = Constants.messageRedColor
-        if GlobalVariables.reversedColors {
-            messageLabel.backgroundColor = Constants.messageBlueColor
-        } else {
-            messageLabel.backgroundColor = Constants.messageRedColor
-        }
+        messageLabel.backgroundColor = GlobalVariables.reversedColors ? Constants.messageBlueColor : Constants.messageRedColor
     }
     
     func layoutForSomebodyMessage() {
-        //print("In somebody layout")
         nameLabel.isHidden = false
         nameLabel.sizeToFit()
         nameLabel.center = CGPoint(x: nameLabel.bounds.size.width/2.0 + 16 + 4, y: nameLabel.bounds.size.height/2.0 + 4)
         messageLabel.center = CGPoint(x: messageLabel.frame.size.width/2 + 16, y: messageLabel.bounds.size.height/2.0 + nameLabel.bounds.size.height + 8)
-         //messageLabel.backgroundColor = Constants.messageBlueColor
-        if GlobalVariables.reversedColors {
-            messageLabel.backgroundColor = Constants.messageRedColor
-        } else {
-            messageLabel.backgroundColor = Constants.messageBlueColor
-        }
+        messageLabel.backgroundColor = GlobalVariables.reversedColors ? Constants.messageRedColor : Constants.messageBlueColor
         
     }
     
     // MARK: - Called through setNeedsLayout()
     override func layoutSubviews() {
         super.layoutSubviews()
-        //print("In messageCell layout")
-        //messageLabel.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+
         if isJoinMessage {
             layoutForJoinMessage()
             messageLabel.layer.cornerRadius = min(messageLabel.bounds.size.height/2.0, 20)

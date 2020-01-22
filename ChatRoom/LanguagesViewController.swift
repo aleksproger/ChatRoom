@@ -27,7 +27,7 @@ class LanguagesViewController: UIViewController {
     }
     
     func swipeToChat(translationType: TranslationType) {
-        let vc = ChatRoomViewController(MessageInputView(translationType))
+        let vc = ChatRoomViewController(MessageInputView(translationType), tableView: UITableView())
         self.navigationController?.pushViewController(vc, animated: true)
         
         
@@ -56,14 +56,13 @@ class LanguagesViewController: UIViewController {
 
 class LanguagesVCFactory {
     func makeInputGroup(forView view: UIView) -> InputViewPair {
-        let inputGroup = InputViewPair(InputPairViewModel())
+        let inputGroup = InputViewPair(InputPairViewModel(YandexTranslator()))
         var insets = view.safeAreaInsets
         if insets.bottom == 0 {
             insets.bottom = 16
         } else {
             insets.bottom = 0
         }
-//        print(insets.top)
         inputGroup.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: 2 * 44 + 40)
         inputGroup.center = CGPoint(x: inputGroup.bounds.size.width/2.0, y: inputGroup.bounds.height/2.0 + insets.top + 15)
         return inputGroup

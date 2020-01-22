@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class Label: UILabel {
+class MessageLabel: UILabel {
     
     override func drawText(in rect: CGRect) {
       let insets = UIEdgeInsets.init(top: 8, left: 16, bottom: 8, right: 16)

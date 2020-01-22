@@ -10,13 +10,14 @@ import UIKit
 import Combine
 
 class InputViewPair: UIView {
-
+    
     private(set) var topView = TranslationInputView(.engToRus, viewModel: TranslationInputViewModel())
     private(set) var bottomView = TranslationInputView(.rusToEng, viewModel: TranslationInputViewModel())
     
     var subscriptions = Set<AnyCancellable>()
     var swipeMade = PassthroughSubject<TranslationType, Never>()
     var viewModel: InputPairViewModel?
+    
     convenience init(_ viewModel: InputPairViewModel) {
         self.init(frame: .zero)
         self.viewModel = viewModel
@@ -24,16 +25,17 @@ class InputViewPair: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        //self.viewModel = InputPairViewModel()
         addSubview(topView)
         addSubview(bottomView)
         subscribeToSendTap()
         subscribeToClearTap()
+        subscribeToRecordTap()
+        subscribeToMicroTap()
         bottomView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(recognizer:))))
         topView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(recognizer:))))
     }
     
-
+    
     override func layoutSubviews() {
         let insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         topView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: 44)
@@ -54,7 +56,6 @@ class InputViewPair: UIView {
         moveTheView(recognizer: recognizer)
         if recognizer.state == UIGestureRecognizer.State.ended {
             let recognizerView = recognizer.view as! TranslationInputView
-
             swipeMade.send(recognizerView.translationType)
             UIView.animate(withDuration: 1) {
                 recognizer.view?.center.x = (self.center.x)
@@ -99,26 +100,47 @@ class InputViewPair: UIView {
     }
     
     func subscribeToSendTap() {
-        topView.sendTapped.sink { _ in
-            self.bottomView.setTypingMode()
-            let textForTranslation = self.topView.textField.text ?? ""
-            self.viewModel?.manager.translate(.engToRus, text: textForTranslation) { translation in
-                DispatchQueue.main.async {
-                    self.bottomView.textField.text = translation
-                }
-            }
+        
+        topView.sendTapped
+            .receive(on: DispatchQueue.main)
+            .mapError({ _ in TranslationError.impossible})
+            .flatMap(maxPublishers: .max(1)) { text -> AnyPublisher<String, TranslationError> in
+                self.bottomView.setTypingMode()
+                return self.viewModel!.manager.translate(self.topView.translationType, text: text)
         }
-        .store(in: &subscriptions)
-        bottomView.sendTapped.sink { _ in
-            self.topView.setTypingMode()
-            let textForTranslation = self.bottomView.textField.text ?? ""
-            self.viewModel?.manager.translate(.rusToEng, text: textForTranslation) { translation in
-                DispatchQueue.main.async {
-                    self.topView.textField.text = translation
-                }
+        .receive(on: DispatchQueue.main)
+        .sink(receiveCompletion: { (value) in
+            switch value {
+            case .failure:
+                break
+            case .finished:
+                break
             }
+        }, receiveValue: { translation in
+            self.bottomView.textField.text = translation
+        })
+            .store(in: &subscriptions)
+        
+        
+        bottomView.sendTapped
+            .receive(on: DispatchQueue.main)
+            .mapError({ _ in TranslationError.impossible})
+            .flatMap(maxPublishers: .max(1)) { text -> AnyPublisher<String, TranslationError> in
+                self.topView.setTypingMode()
+                return self.viewModel!.manager.translate(self.bottomView.translationType, text: text)
         }
-        .store(in: &subscriptions)
+        .receive(on: DispatchQueue.main)
+        .sink(receiveCompletion: { (value) in
+            switch value {
+            case .failure:
+                break
+            case .finished:
+                break
+            }
+        }, receiveValue: { translation in
+            self.topView.textField.text = translation
+        })
+            .store(in: &subscriptions)
     }
     
     func subscribeToClearTap() {
@@ -134,5 +156,40 @@ class InputViewPair: UIView {
         .store(in: &subscriptions)
     }
     
+    func subscribeToRecordTap() {
+        topView.recordTapped
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                self.topView.setTypingMode()
+                self.topView.textField.becomeFirstResponder()
+        }
+        .store(in: &subscriptions)
+        
+        bottomView.recordTapped
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                self.bottomView.setTypingMode()
+                self.bottomView.textField.becomeFirstResponder()
+        }
+        .store(in: &subscriptions)
+    }
+    
+    func subscribeToMicroTap() {
+        topView.microTapped
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                print("top micro tapped")
+                self.bottomView.setDefaultMode()
+        }
+        .store(in: &subscriptions)
+        
+        bottomView.microTapped
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                print("bottom micro tapped")
+                self.topView.setDefaultMode()
+        }
+        .store(in: &subscriptions)
+    }
 }
 

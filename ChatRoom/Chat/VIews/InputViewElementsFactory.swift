@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 
 class Factory {
-    
     func makeFlagsView(_ translationType: TranslationType, forView view: UIView) -> UIView{
         let rusImageView = UIImageView(image: UIImage(named: "rus"))
         let engImageView = UIImageView(image: UIImage(named: "eng"))
@@ -64,6 +63,8 @@ class Factory {
             shadows.layer.shadowColor = Constants.blueShadowColor
         case .rusToEng:
             shadows.layer.shadowColor = Constants.redShadowColor
+        case .none:
+            break
         }
         
         return shadows
@@ -115,6 +116,27 @@ class Factory {
         textField.clearsOnInsertion = true
         textField.tintColor = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
         switch view.translationType {
+        case .engToRus:
+            textField.text = "Английский"
+        case .rusToEng:
+            textField.text = "Русский"
+        case .none:
+            break
+        }
+        return textField
+    }
+    
+    func makeTextField(for bounds: CGRect, with translationType: TranslationType) -> UITextField {
+        let textField = UITextField()
+        textField.frame = CGRect(x: 0, y: 0, width: bounds.width - 62 - 56, height: 20.0)
+        textField.center = CGPoint(x: bounds.minX + 56 + textField.bounds.width/2.0, y: bounds.height/2.0)
+        textField.textColor = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
+        textField.font = UIFont(name: Constants.chatFont, size: Constants.placeholderFontSize)
+        textField.alpha = 0.8
+        textField.autocorrectionType = .no
+        textField.clearsOnInsertion = true
+        textField.tintColor = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
+        switch translationType {
         case .engToRus:
             textField.text = "Английский"
         case .rusToEng:

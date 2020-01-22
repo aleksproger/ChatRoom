@@ -10,8 +10,8 @@ import Foundation
 
 enum TranslationType: String, Codable {
     
-    case engToRus
-    case rusToEng
+    case engToRus = "en-ru"
+    case rusToEng = "ru-en"
 }
 
 enum InputType {

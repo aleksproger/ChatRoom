@@ -22,12 +22,19 @@ import Combine
 }
 
 protocol InputView: UIView {
-    var viewModel: MessageInputDelegate? { get set }
-    var translationType: TranslationType { get }
+    var clearButton: UIButton! { get set }
+    var sendButton: UIButton!  { get set }
+    var recordButton: UIButton!  { get set }
+    var flagsView: UIView!  { get set }
 }
 
 
 class MessageInputView: UIView {
+    var clearButton: UIButton!
+    var sendButton: UIButton!
+    var recordButton: UIButton!
+    var flagsView: UIView!
+    
     var speechRecognition = SpeechRecognition()
     var viewModel: MessageInputViewModel?
     var subscriptions = Set<AnyCancellable>()
@@ -36,47 +43,35 @@ class MessageInputView: UIView {
     var text: String = "Английский"
     
     private let factory = Factory()
-    
     private var shadows = UIView()
     private var shapes = UIView()
     
-    var flagsView: UIView!
+
     
     var textField = UITextField()
     
     var micButton = UIButton()
-    var clearButton = UIButton()
-    
-    var sendButton = UIButton()
-    var recordButton = UIButton()
+
     
     private(set) var translationType: TranslationType = .rusToEng
     
     convenience init(_ translationType: TranslationType) {
         self.init(frame: .zero)
         self.translationType = translationType
-
-        self.viewModel = MessageInputViewModel(self, recognizer: SpeechRecognition())
-
-        
-        self.textField.delegate = viewModel as? UITextFieldDelegate
+        self.viewModel = MessageInputViewModel(recognizer: SpeechRecognition())
+        self.textField.delegate = self
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        //shadows = factory.makeShadowView(forView: self)
         translatesAutoresizingMaskIntoConstraints = false
         shadows.translatesAutoresizingMaskIntoConstraints = false
         shapes.translatesAutoresizingMaskIntoConstraints = false
         shapes.clipsToBounds = true
         shadows.clipsToBounds = false
-
         addSubview(shadows)
         addSubview(shapes)
-        //textField = factory.makeTextField(forView: self)
-        //textField.delegate = viewModel as? UITextFieldDelegate
         addSubview(textField)
-        
         micButton.setImage(UIImage(named: "micro")!, for: .normal)
         addSubview(micButton)
         
@@ -89,31 +84,20 @@ class MessageInputView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         flagsView = factory.makeFlagsView(translationType, forView: self)
         addSubview(flagsView)
-
         setShadows()
         setShape()
-        
         makeTextFieldView()
-
-        
         micButton.frame = CGRect(x: 0, y: 0, width: 12, height: 16)
         micButton.center = CGPoint(x: bounds.maxX - 16 - micButton.bounds.width/2.0, y: bounds.height/2.0)
-        
         sendButton = factory.makeSendButton(forView: self)
         addSubview(sendButton)
-        
         clearButton = factory.makeClearButton(forView: self)
         addSubview(clearButton)
-        
         recordButton = factory.makeRecordButton(forView: self)
         addSubview(recordButton)
-        
-        
         registerButtons()
-        
     }
     func registerButtons() {
         micButton.addTarget(self, action: #selector(microButtonTapped), for: .touchUpInside)
@@ -188,9 +172,9 @@ class MessageInputView: UIView {
         }
     }
     
-    @objc func setTypingMode() {
+    func setTypingMode(_ text: String = "") {
             textField.becomeFirstResponder()
-            textField.text = ""
+            textField.text = text
             textField.alpha = 1
             micButton.isHidden = true
             sendButton.isHidden = false
@@ -199,19 +183,39 @@ class MessageInputView: UIView {
     }
     
     @objc func microButtonTapped() {
-        speechRecognition.startRecording() { isAuthorized in
-            if isAuthorized {
-                DispatchQueue.main.async {
-                    print("Authorized")
-                    self.clearButton.isHidden = true
-                    self.sendButton.isHidden = true
-                    self.micButton.isHidden = true
-                    self.recordButton.isHidden = false
-                    self.textField.text = "Говорите..."
-                }
+        setRecordingMode()
+        speechRecognition.startRecordingCombine()
+            .sink(receiveCompletion: { (completion) in
+            switch completion {
+            case .finished:
+                print("Finished")
+            case .failure(let error):
+                print(error.localizedDescription)
             }
-        }
-
+                }, receiveValue: {
+                    (translation) in
+                    print(translation)
+                    self.setTypingMode(translation)
+                })
+            .store(in: &subscriptions)
+//        speechRecognition.startRecording() { isAuthorized in
+//            DispatchQueue.main.async {
+//                if isAuthorized {
+//                    print("Authorized")
+//                    self.setRecordingMode()
+//                } else {
+//                    self.setDefaultMode()
+//                }
+//            }
+//        }
+    }
+    
+    func setRecordingMode() {
+        self.clearButton.isHidden = true
+        self.sendButton.isHidden = true
+        self.micButton.isHidden = true
+        self.recordButton.isHidden = false
+        self.textField.text = "Говорите..."
     }
     
     @objc func recordButtonTapped() {
@@ -236,21 +240,16 @@ class MessageInputView: UIView {
 
 
 extension MessageInputView: UITextFieldDelegate {
-    
-    
     func textFieldDidBeginEditing(_ textField: UITextField) {
         setTypingMode()
     }
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         setDefaultMode()
         textField.resignFirstResponder()
         return true
     }
-    
     func textFieldDidEndEditing(_ textField: UITextField) {
         setDefaultMode()
         textField.resignFirstResponder()
     }
-    
 }

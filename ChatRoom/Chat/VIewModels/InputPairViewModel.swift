@@ -11,8 +11,9 @@ import UIKit
 import Combine
 
 class InputPairViewModel: NSObject {
-    private weak var view: InputViewPair?
-    let manager = APIManager()
-    
+    var manager: Translator
+    init(_ manager: Translator) {
+        self.manager = manager
+    }
 }
 

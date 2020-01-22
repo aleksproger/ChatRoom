@@ -23,27 +23,25 @@ import Combine
 
 class TranslationInputView: UIView {
     var viewModel: TranslationInputViewModel?
-    var text: String = "Английский"
+    var clearButton: UIButton!
+    var sendButton: UIButton!
+    var recordButton: UIButton!
     
-    private let factory = Factory()
     
     private var shadows = UIView()
     private var shapes = UIView()
     
     var flagsView: UIView!
-    
     var textField = UITextField()
-    
     var micButton = UIButton()
-    var clearButton = UIButton()
+    private let factory = Factory()
     
-    var sendButton = UIButton()
-    var recordButton = UIButton()
+    private(set) var translationType: TranslationType!// = .rusToEng
     
-    private(set) var translationType: TranslationType = .rusToEng
-    
-    var sendTapped = PassthroughSubject<Bool, Never>()
+    var sendTapped = PassthroughSubject<String, Never>()
     var clearTapped = PassthroughSubject<Bool, Never>()
+    var recordTapped = PassthroughSubject<Bool, Never>()
+    var microTapped = PassthroughSubject<Bool, Never>()
     
     convenience init(_ translationType: TranslationType, viewModel: TranslationInputViewModel) {
         self.init(frame: .zero)
@@ -85,8 +83,6 @@ class TranslationInputView: UIView {
         setShape()
         
         makeTextFieldView()
-        
-        
         micButton.frame = CGRect(x: 0, y: 0, width: 12, height: 16)
         micButton.center = CGPoint(x: bounds.maxX - 16 - micButton.bounds.width/2.0, y: bounds.height/2.0)
         
@@ -99,8 +95,8 @@ class TranslationInputView: UIView {
         recordButton = factory.makeRecordButton(forView: self)
         addSubview(recordButton)
         registerButtons()
-        
     }
+    
     func registerButtons() {
         micButton.addTarget(self, action: #selector(microButtonTapped), for: .touchUpInside)
         clearButton.addTarget(self, action: #selector(clearButtonTapped), for: .touchUpInside)
@@ -118,6 +114,8 @@ class TranslationInputView: UIView {
             shapes.layer.backgroundColor = Constants.messageBlueColor.cgColor
         case .rusToEng:
             shapes.layer.backgroundColor = Constants.messageRedColor.cgColor
+        case .none:
+            break
         }
         
     }
@@ -137,6 +135,8 @@ class TranslationInputView: UIView {
             shadows.layer.shadowColor = Constants.blueShadowColor
         case .rusToEng:
             shadows.layer.shadowColor = Constants.redShadowColor
+        case .none:
+            break
         }
         
     }
@@ -156,8 +156,12 @@ class TranslationInputView: UIView {
             textField.text = "Английский"
         case .rusToEng:
             textField.text = "Русский"
+        case .none:
+            break
         }
     }
+    
+    
     
     @objc func setDefaultMode() {
         textField.resignFirstResponder()
@@ -171,6 +175,8 @@ class TranslationInputView: UIView {
             textField.text = "Английский"
         case .rusToEng:
             textField.text = "Русский"
+        case .none:
+            break
         }
     }
     
@@ -184,6 +190,7 @@ class TranslationInputView: UIView {
     }
     
     @objc func microButtonTapped() {
+        microTapped.send(true)
         clearButton.isHidden = true
         sendButton.isHidden = true
         micButton.isHidden = true
@@ -192,11 +199,19 @@ class TranslationInputView: UIView {
     }
     
     @objc func recordButtonTapped() {
+        recordTapped.send(true)
         clearButton.isHidden = true
         sendButton.isHidden = true
         micButton.isHidden = false
         recordButton.isHidden = true
-        textField.text = "Английский"
+        switch translationType {
+        case .engToRus:
+            textField.text = "Английский"
+        case .rusToEng:
+            textField.text = "Русский"
+        case .none:
+            break
+        }
     }
     
     @objc func clearButtonTapped() {
@@ -207,8 +222,9 @@ class TranslationInputView: UIView {
     
     @objc func sendButtonTapped() {
         print("send tapped")
-        if !textField.text!.withoutWhitespace().isEmpty {
-            sendTapped.send(true)
+        let text = textField.text!.withoutWhitespace()
+        if !text.isEmpty {
+            sendTapped.send(text)
         }
     }
     

@@ -70,5 +70,31 @@ extension ChatRoomViewModel: UITableViewDelegate {
         UIApplication.shared.sendAction(#selector(MessageInputView.setDefaultMode), to: nil, from: nil, for: nil)
     }
     
+}
 
+extension ChatRoomViewModel: ChatServiceDelegate {
+    func receiveJoinMessage(message: String) {
+        if message.withoutWhitespace() != "" {
+            let message = Message(message: message, messageSender: .somebody, username: "System")
+            DispatchQueue.main.async {
+                self.insertMessage(message)
+            }
+        }
+    }
+    
+    func receiveMessage(message: Message) {
+        if message.message != "" {
+            DispatchQueue.main.async {
+                self.insertMessage(message)
+            }
+        }
+    }
+    
+    func sendMessage(message: String, translationType: TranslationType) {
+        if message.withoutWhitespace() != "" {
+            //ChatService.shared.writeMessage(message.message)
+            //insertNewMessageCell(Message(message: "lol", messageSender: .ourself, username: "Alex"))
+            ChatService.shared.sendMessaage(OutputMessage(text: message, type: translationType, username: "Alex"))
+        }
+    }
 }
