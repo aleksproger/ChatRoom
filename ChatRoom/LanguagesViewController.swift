@@ -27,7 +27,7 @@ class LanguagesViewController: UIViewController {
     }
     
     func swipeToChat(translationType: TranslationType) {
-        let vc = ChatRoomViewController(MessageInputView(translationType), tableView: UITableView())
+        let vc = ChatRoomViewController(ChatRoomViewModel(), inputBar: MessageInputView(translationType))
         self.navigationController?.pushViewController(vc, animated: true)
         
         

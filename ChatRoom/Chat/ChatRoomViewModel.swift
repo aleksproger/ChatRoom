@@ -9,6 +9,11 @@
 import Foundation
 import UIKit
 import Combine
+protocol ChatServiceDelegate {
+    func receiveMessage(message: Message)
+    func receiveJoinMessage(message: String)
+    func sendMessage(message: String, translationType: TranslationType)
+}
 
 class ChatRoomViewModel: NSObject, ObservableObject {
     var messages = CurrentValueSubject<[Message], Never>([
