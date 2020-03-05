@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import Combine
 
-protocol INView {
+protocol InputView {
     func setTypingMode(_ text: String)
     func setDefaultMode()
     func setRecordingMode()
@@ -38,7 +38,7 @@ protocol INView {
     
 }
 
-extension INView where Self: UIView {
+extension InputView where Self: UIView {
     
     func setRecordingMode() {
         self.clearButton.isHidden = true

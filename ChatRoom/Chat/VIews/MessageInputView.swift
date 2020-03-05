@@ -21,15 +21,15 @@ import Combine
     //func sendButtonTapped()
 }
 
-protocol InputView: UIView {
-    var clearButton: UIButton! { get set }
-    var sendButton: UIButton!  { get set }
-    var recordButton: UIButton!  { get set }
-    var flagsView: UIView!  { get set }
-}
+//protocol InputView: UIView {
+//    var clearButton: UIButton! { get set }
+//    var sendButton: UIButton!  { get set }
+//    var recordButton: UIButton!  { get set }
+//    var flagsView: UIView!  { get set }
+//}
 
 
-class MessageInputView: UIView, INView {
+class MessageInputView: UIView, InputView {
     
     var clearButton: UIButton!
     var sendButton: UIButton!
@@ -45,7 +45,6 @@ class MessageInputView: UIView, INView {
     let factory = Factory()
     
     var translationType: TranslationType = .rusToEng
-    
 
     
     var speechRecognition = SpeechRecognition()
@@ -126,12 +125,14 @@ class MessageInputView: UIView, INView {
     
     @objc func microButtonTapped() {
         setRecordingMode()
-        speechRecognition.startRecordingCombine()
-            .sink(receiveCompletion: { (completion) in
+        speechRecognition.startRecording()
+            .sink(receiveCompletion: { [weak self] (completion) in
+            self?.speechRecognition.stopRecording()
             switch completion {
             case .finished:
                 print("Finished")
             case .failure(let error):
+                self?.setTypingMode()
                 print(error.localizedDescription)
             }
                 }, receiveValue: {
@@ -152,11 +153,7 @@ class MessageInputView: UIView, INView {
     
     @objc func recordButtonTapped() {
         speechRecognition.stopRecording()
-        clearButton.isHidden = true
-        sendButton.isHidden = true
-        micButton.isHidden = false
-        recordButton.isHidden = true
-        textField.text = "Английский"
+        setTypingMode()
     }
     
     @objc func clearButtonTapped() {

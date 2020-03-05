@@ -11,71 +11,70 @@ import Speech
 import Combine
 
 protocol Recognition {
-    func startRecording(callback: @escaping(Bool) -> Void)
+    func startRecording() -> AnyPublisher<String, TranslationError>
     func stopRecording()
 }
 
 class SpeechRecognition: Recognition {
     let engine = AVAudioEngine()
     let req = SFSpeechAudioBufferRecognitionRequest()
+    var recognitionTask: SFSpeechRecognitionTask?
     var subscriptions = Set<AnyCancellable>()
-    
-    func startRecordingCombine() -> AnyPublisher<String, TranslationError> {
-            let rec = self.configureRecognitionTask()
+    func startRecording() -> AnyPublisher<String, TranslationError> {
+            //let rec = self.configureRecognitionTask()
+            let configurePublisher = self.configureRecognitionTaskC()
             return self.requestAuth()
-                .flatMap(maxPublishers: .max(1)) { (isAuthorized) in
-                    self.startRecognitionTask(with: rec!)
-                }
-            .eraseToAnyPublisher()
-    }
-    func startRecording(callback: @escaping (Bool) -> Void) {
-        let rec = self.configureRecognitionTask()
-        //requestAuthorization(rec: rec!, callback: callback)
-        
-        self.requestAuth()
-            .flatMap(maxPublishers: .max(1)) { (isAuthorized) in
-                self.startRecognitionTask(with: rec!)
-            }
-        .sink(receiveCompletion: { (completion) in
-            switch completion {
-            case .finished:
-                print("Finished")
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }) { (translation) in
-            print(translation)
+                    .flatMap(maxPublishers: .max(1)) { _ in
+                        configurePublisher
+                    }
+                    .flatMap(maxPublishers: .max(1)) { rec in
+                        self.startRecognitionTask(with: rec)
+                    }
+                .eraseToAnyPublisher()
         }
-    .store(in: &subscriptions)
-//        rec!.recognitionTask(with: self.req) { result, err in
-//            print(result?.bestTranscription.formattedString)
-//        }
-        
-//        self.requestAuth()
-//            .sink(receiveCompletion: { completion in
-//                if case .failure(let error) = completion {
-//                    print(error)
-//                }
-//            }, receiveValue: { value in
-//                let rec = self.configureRecognitionTask()
-//                rec!.recognitionTask(with: self.req) { result, err in
-//                    print(result?.bestTranscription.formattedString)
-//                }
-//            })
-//        .store(in: &subscriptions)
 
-    }
-    
     func startRecognitionTask(with recognizer: SFSpeechRecognizer) -> Future<String, TranslationError> {
         return Future<String, TranslationError> { promise in
             recognizer.recognitionTask(with: self.req) { (result, error) in
                 if error != nil {
+                    self.stopRecording()
                     return promise(.failure(.speech(description: error!.localizedDescription)))
                 }
-                return promise(.success(result?.bestTranscription.formattedString ?? "No transcription"))
+                guard let result = result else {
+                    return promise(.failure(.speech(description: "No result")))
+
+                }
+                if result.isFinal {
+                    self.stopRecording()
+                }
+                
+                return promise(.success(result.bestTranscription.formattedString ?? "No transcription"))
             }
         }
     }
+    
+    func configureRecognitionTaskC() -> AnyPublisher<SFSpeechRecognizer, TranslationError>{
+        return Future<SFSpeechRecognizer, TranslationError> { promise in
+            let loc = Locale(identifier: "ru-RU")
+            guard let rec = SFSpeechRecognizer(locale:loc) else {
+                return promise(.failure(.speech(description: "No such locale")))
+            }
+            let input = self.engine.inputNode
+            input.installTap(onBus: 0, bufferSize: 4096,
+                             format: input.outputFormat(forBus: 0)) { buffer, time in
+                                self.req.append(buffer)
+                                return promise(.success(rec))
+            }
+            self.engine.prepare()
+            do {
+                try self.engine.start()
+            } catch(let error) {
+                return promise(.failure(.speech(description: error.localizedDescription)))
+            }
+        }.eraseToAnyPublisher()
+
+    }
+
     
     func configureRecognitionTask() -> SFSpeechRecognizer?{
         let loc = Locale(identifier: "ru-RU")
@@ -85,7 +84,10 @@ class SpeechRecognition: Recognition {
         let input = self.engine.inputNode
         input.installTap(onBus: 0, bufferSize: 4096,
                          format: input.outputFormat(forBus: 0)) { buffer, time in
+            DispatchQueue.main.async {
             self.req.append(buffer)
+            //print("Node installed")
+            }
         }
         self.engine.prepare()
         guard let _ = try? self.engine.start() else {
@@ -113,25 +115,6 @@ class SpeechRecognition: Recognition {
                 }
             }
 
-        }
-    }
-    func requestAuthorization(rec: SFSpeechRecognizer, callback: @escaping (Bool) -> Void){
-        SFSpeechRecognizer.requestAuthorization { (status) in
-            switch status {
-            case .authorized:
-                callback(true)
-                rec.recognitionTask(with: self.req) { result, err in
-                    print(result?.bestTranscription.formattedString)
-                }
-            case .denied:
-                callback(false)
-            case .restricted:
-                callback(false)
-            case .notDetermined:
-                callback(false)
-            @unknown default:
-                fatalError()
-            }
         }
     }
 }

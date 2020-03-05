@@ -43,16 +43,18 @@ class ChatService {
     }
     
     func sendMessaage(_ message: OutputMessage) {
-        guard let socket = socket else {
-            print("no socket")
-            return
-        }
-        let jsonEncoder = JSONEncoder()
-        let data = try? jsonEncoder.encode(message)
-        guard data != nil else {
-            return
-        }
-        socket.write(data: data!) 
+        //        guard let socket = socket else {
+        //            print("no socket")
+        //            return
+        //        }
+        //        let jsonEncoder = JSONEncoder()
+        //        let data = try? jsonEncoder.encode(message)
+        //        guard data != nil else {
+        //            return
+        //        }
+        //        socket.write(data: data!)
+            messageReceived.send(Message(message: "test", translatedMessage: "тест", messageSender: .ourself, username: "Carramba"))
+
     }
     
     func receiveJoinMessage(text: String) {
