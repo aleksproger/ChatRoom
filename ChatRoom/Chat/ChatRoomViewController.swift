@@ -15,19 +15,27 @@ protocol ChatServiceDelegate {
     func sendMessage(message: String, translationType: TranslationType)
 }
 
-class ChatRoomViewController: UIViewController {
-    private var keyboardIsShown: Bool = false
+protocol ChatRoom: UIViewController {
+    var keyboardIsShown: Bool { get set }
+    var messageInputBar: MessageInputView! { get set }
+    var tableView: UITableView { get set }
+}
+
+
+class ChatRoomViewController: UIViewController, ChatRoom {
+    
+    internal var keyboardIsShown: Bool = false
     private var lastContentOffset: CGFloat = 0
     private var currentContentInset: UIEdgeInsets = .zero
     private var viewModel = ChatRoomViewModel()
     private var subscriptions = Set<AnyCancellable>()
-    var tableView: UITableView!
+    var tableView: UITableView = UITableView()
     var messageInputBar: MessageInputView!
     
     init(_ inputBar: MessageInputView, tableView: UITableView) {
         super.init(nibName: nil, bundle: nil)
         self.messageInputBar = inputBar
-        self.tableView = tableView
+        //self.tableView = tableView
         GlobalVariables.reversedColors = inputBar.translationType == .rusToEng ? true : false
     }
     
@@ -166,55 +174,7 @@ extension ChatRoomViewController {
             self.navigationController?.popViewController(animated: true)
         }
     }
-    
-    @objc func keyboardWillChange(notification: Notification) {
-        keyboardIsShown.toggle()
-        guard let endFrame = processKeyboardNotification(notification) else {
-            return
-        }
-        let messageBarHeight = self.messageInputBar.bounds.size.height
-        var insets = view.safeAreaInsets
-        // To make inpit view 16px higher of phone frame when device lower than iphone X
-        if insets.bottom == 0 {
-            insets.bottom = 16
-        }
-        let point = CGPoint(x: self.messageInputBar.center.x, y: endFrame.origin.y - messageBarHeight/2.0 - (keyboardIsShown ? 16 : insets.bottom))
-//        print(insets.bottom)
-        let inset = UIEdgeInsets(top: (keyboardIsShown ? (endFrame.size.height - insets.bottom + 16) : 0), left: 0, bottom: 0, right: 0)
-        animateKeyboardAppearance(point: point, inset: inset)
-        
-    }
-    
-    func animateKeyboardAppearance(point: CGPoint, inset: UIEdgeInsets) {
-        UIView.animate(withDuration: 0.25) {
-            self.messageInputBar.center = point
-            self.tableView.contentInset = inset
-            if self.tableView.numberOfSections != 0 && self.tableView.numberOfRows(inSection: 0) != 0  && self.tableView.contentInset.top != 0{
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .none, animated: false)
-            }
-        }
-    }
-    
-    func processKeyboardNotification(_ notification: Notification) -> CGRect? {
-        guard let userInfo = notification.userInfo else {
-            return nil
-        }
-        let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)!.cgRectValue
-        keyboardIsShown = isKeyboardReallyShown(keyboardFrame: endFrame)
-        return endFrame
-        
-    }
-    
-    func isKeyboardReallyShown(keyboardFrame: CGRect) -> Bool {
-        let safeArea = view.safeAreaLayoutGuide
-        if keyboardIsShown &&  (safeArea.layoutFrame.maxY <= keyboardFrame.minY) {
-            return false
-        } else if !keyboardIsShown && (safeArea.layoutFrame.maxY > keyboardFrame.minY) {
-            return true
-        }
-        
-        return keyboardIsShown
-    }
 
 }
 
+extension ChatRoomViewController: KeyboardShowable {}
