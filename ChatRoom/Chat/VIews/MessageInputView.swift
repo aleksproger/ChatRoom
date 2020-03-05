@@ -21,13 +21,6 @@ import Combine
     //func sendButtonTapped()
 }
 
-//protocol InputView: UIView {
-//    var clearButton: UIButton! { get set }
-//    var sendButton: UIButton!  { get set }
-//    var recordButton: UIButton!  { get set }
-//    var flagsView: UIView!  { get set }
-//}
-
 
 class MessageInputView: UIView, InputView {
     
@@ -127,7 +120,7 @@ class MessageInputView: UIView, InputView {
         setRecordingMode()
         speechRecognition.startRecording()
             .sink(receiveCompletion: { [weak self] (completion) in
-            self?.speechRecognition.stopRecording()
+            //self?.speechRecognition.stopRecording()
             switch completion {
             case .finished:
                 print("Finished")
@@ -141,6 +134,8 @@ class MessageInputView: UIView, InputView {
                     self.setTypingMode(translation)
                 })
             .store(in: &subscriptions)
+        speechRecognition.stopRecording()
+
     }
     
     func setRecordingMode() {

@@ -75,28 +75,6 @@ class SpeechRecognition: Recognition {
 
     }
 
-    
-    func configureRecognitionTask() -> SFSpeechRecognizer?{
-        let loc = Locale(identifier: "ru-RU")
-        guard let rec = SFSpeechRecognizer(locale:loc) else {
-            return nil
-        }
-        let input = self.engine.inputNode
-        input.installTap(onBus: 0, bufferSize: 4096,
-                         format: input.outputFormat(forBus: 0)) { buffer, time in
-            DispatchQueue.main.async {
-            self.req.append(buffer)
-            //print("Node installed")
-            }
-        }
-        self.engine.prepare()
-        guard let _ = try? self.engine.start() else {
-            print("Can't start engine")
-            return nil
-        }
-        return rec
-    }
-    
     func stopRecording() {
         engine.stop()
         engine.inputNode.removeTap(onBus: 0)
